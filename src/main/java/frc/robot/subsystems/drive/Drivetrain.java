@@ -8,6 +8,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -25,7 +26,7 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
 
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    //private final Gyro gyro; //Todo: add a gyro
+    private final Gyro gyro;
 
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
@@ -49,7 +50,7 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
         this.backLeft = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_LEFT);
         this.backRight = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_RIGHT);
 
-        //this.gyro = hardware.createGyro(String.class, 0); //Replace with ACTUAL gyro creation
+        this.gyro = hardware.createGyro(ADXRS450_Gyro.class, 0); //Replace with ACTUAL gyro creation
 
         this.kinematics = new SwerveDriveKinematics(
                 Constants.Swerve.Hardware.FL_POS,
@@ -175,12 +176,11 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
     }
 
     private Rotation2d getAngle() {
-        return Rotation2d.fromRadians(0);
-        //return Rotation2d.fromRadians(this.gyro.getAngle());
+        return Rotation2d.fromRadians(this.gyro.getAngle());
     }
 
     private void resetGyro() {
-        //this.gyro.reset();
+        this.gyro.reset();
     }
 
     private boolean isFieldRelative() {

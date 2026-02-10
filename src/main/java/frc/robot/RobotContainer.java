@@ -5,6 +5,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
 import frc.robot.hardware.Hardware;
+import frc.robot.hardware.impl.HardwareImpl;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -26,7 +27,8 @@ public class RobotContainer {
     private final MessageBus messageBus;
 
     public RobotContainer(Robot robot) {
-        this.hardware = robot.getHardware();
+        this.hardware = new Hardware();
+        HardwareImpl.register(this.hardware);
         this.messageBus = new MessageBus(MessageBus.MessageExecutorType.SINGLE);
 
         this.drivetrain = new Drivetrain(this);

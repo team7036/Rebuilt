@@ -3,7 +3,6 @@ package frc.robot.hardware.impl.encoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkMaxAbsoluteEncoder;
 import frc.robot.hardware.Encoder;
 import frc.robot.hardware.Hardware;
 
