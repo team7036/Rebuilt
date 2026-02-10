@@ -27,24 +27,19 @@ public class RobotContainer {
 
     public RobotContainer(Robot robot) {
         this.hardware = robot.getHardware();
+        this.messageBus = new MessageBus(MessageBus.MessageExecutorType.SINGLE);
 
         this.drivetrain = new Drivetrain(this);
-
-        this.messageBus = new MessageBus(MessageBus.MessageExecutorType.SINGLE);
 
         configureBindings();
     }
 
     private void configureBindings() {
 
-        //noinspection FunctionalExpressionCanBeFolded
         drivetrain.setDefaultCommand(
                 new DefaultDrivetrainCommand(
                         drivetrain,
-                        driverController::getLeftX,
-                        driverController::getLeftY,
-                        driverController::getRightX,
-                        driverController.rightBumper()::getAsBoolean
+                        this.driverController
                 )
         );
     }

@@ -18,7 +18,6 @@ public class PeriodicManager {
         PERIODICS.entrySet().removeIf((e) -> e.getValue().get() == null);
 
         PERIODICS.forEach((name, weak) -> {
-            System.out.println("Periodic - " + name);
             Periodic p = weak.get();
             if(p == null) throw new IllegalStateException("Cannot have a null periodic!");
             p.periodic();

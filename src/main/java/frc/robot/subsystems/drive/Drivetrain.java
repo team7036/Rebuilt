@@ -8,23 +8,24 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.hardware.Gyro;
 import frc.robot.hardware.Hardware;
+import frc.robot.hardware.sysid.SysIdRoutine;
 import frc.robot.hardware.sysid.SysIdRoutineContainer;
 import frc.robot.util.messagingv1.MessageChannel;
 import frc.robot.util.messagingv1_1.MessageChannelOwner;
-import frc.robot.util.sendablesv2.SendingSubsystem;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class Drivetrain extends SendingSubsystem implements MessageChannelOwner {
+public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
 
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    private final Gyro gyro = null; //Todo: add a gyro
+    //private final Gyro gyro; //Todo: add a gyro
 
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
@@ -37,6 +38,7 @@ public class Drivetrain extends SendingSubsystem implements MessageChannelOwner 
     private final MessageChannel channel;
 
     private final SysIdRoutineContainer sysIdContainer;
+    private final SysIdRoutine sysIdRoutine;
 
 
     public Drivetrain(RobotContainer container) {
@@ -46,6 +48,8 @@ public class Drivetrain extends SendingSubsystem implements MessageChannelOwner 
         this.frontRight = new SwerveModule(hardware, Constants.Swerve.Hardware.FRONT_RIGHT);
         this.backLeft = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_LEFT);
         this.backRight = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_RIGHT);
+
+        //this.gyro = hardware.createGyro(String.class, 0); //Replace with ACTUAL gyro creation
 
         this.kinematics = new SwerveDriveKinematics(
                 Constants.Swerve.Hardware.FL_POS,
@@ -94,27 +98,59 @@ public class Drivetrain extends SendingSubsystem implements MessageChannelOwner 
         };
 
 
-        AutoBuilder.configure(
-                this.estimation::estimatePose,
-                this.estimation::resetPose,
-                this.speed::robotRelative,
-                this.speed::driveRobotRelative,
-                pathController,
-                Constants.Swerve.PATHPLANNER_CONFIG,
-                () -> true,
-                this
-        );
+        if(Constants.Swerve.USE_AUTO)
+            AutoBuilder.configure(
+                    this.estimation::estimatePose,
+                    this.estimation::resetPose,
+                    this.speed::robotRelative,
+                    this.speed::driveRobotRelative,
+                    pathController,
+                    Constants.Swerve.PATHPLANNER_CONFIG,
+                    () -> true,
+                    this
+            );
 
         this.channel = container.createChannel(
                 "subsystem/drivetrain",
                 new DrivetrainMessageHandler(this)
         );
 
+        //Setup SysIdRoutineContainer with motors
+
         this.sysIdContainer = new SysIdRoutineContainer();
         this.frontLeft.populateContainer("FL", this.sysIdContainer);
         this.frontRight.populateContainer("FR", this.sysIdContainer);
         this.backLeft.populateContainer("BL", this.sysIdContainer);
         this.backRight.populateContainer("BR", this.sysIdContainer);
+
+        //Setup and Complete SysIdRoutine with test runs
+
+        this.sysIdRoutine = new SysIdRoutine();
+        this.sysIdRoutine.addRoutine(
+                SysIdRoutineContainer.BuiltSubRoutine.build(
+                        this.sysIdContainer,
+                        SysIdRoutineContainer.RoutineType.QUASISTATIC,
+                        SysIdRoutineContainer.Direction.FORWARD
+                )
+        ).addRoutine(
+                SysIdRoutineContainer.BuiltSubRoutine.build(
+                        this.sysIdContainer,
+                        SysIdRoutineContainer.RoutineType.QUASISTATIC,
+                        SysIdRoutineContainer.Direction.BACKWARD
+                )
+        ).addRoutine(
+                SysIdRoutineContainer.BuiltSubRoutine.build(
+                        this.sysIdContainer,
+                        SysIdRoutineContainer.RoutineType.DYNAMIC,
+                        SysIdRoutineContainer.Direction.FORWARD
+                )
+        ).addRoutine(
+                SysIdRoutineContainer.BuiltSubRoutine.build(
+                        this.sysIdContainer,
+                        SysIdRoutineContainer.RoutineType.DYNAMIC,
+                        SysIdRoutineContainer.Direction.BACKWARD
+                )
+        );
     }
 
     private SwerveModulePosition[] getPositions() {
@@ -134,12 +170,17 @@ public class Drivetrain extends SendingSubsystem implements MessageChannelOwner 
         return this.speed.maxSpeed();
     }
 
+    public SysIdRoutine sysIdRoutine() {
+        return this.sysIdRoutine;
+    }
+
     private Rotation2d getAngle() {
-        return Rotation2d.fromRadians(this.gyro.getAngle());
+        return Rotation2d.fromRadians(0);
+        //return Rotation2d.fromRadians(this.gyro.getAngle());
     }
 
     private void resetGyro() {
-        this.gyro.reset();
+        //this.gyro.reset();
     }
 
     private boolean isFieldRelative() {

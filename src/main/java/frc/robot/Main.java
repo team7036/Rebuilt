@@ -17,7 +17,6 @@ import java.util.function.Function;
  */
 //Dw, I know what I'm doing ;)
 public final class Main {
-    private static final Hardware ROBOT_HARDWARE = new Hardware();
 
     private Main() {}
 
@@ -27,13 +26,16 @@ public final class Main {
     * If you change your main Robot class (name), change the parameter type.
     */
     public static void main(String... args) {
-        HardwareImpl.register(ROBOT_HARDWARE);
         startRobotWithHardware(Robot::new);
     }
 
     private static <T extends RobotBase> void startRobotWithHardware(Function<Hardware, T> factory) {
         RobotBase.startRobot(
-                () -> factory.apply(Main.ROBOT_HARDWARE)
+                () -> {
+                    Hardware hardware = new Hardware();
+                    HardwareImpl.register(hardware);
+                    return factory.apply(hardware);
+                }
         );
     }
 

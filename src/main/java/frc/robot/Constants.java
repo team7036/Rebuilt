@@ -38,14 +38,20 @@ public final class Constants {
         public static final SwerveControllerType CONTROLLER_TYPE =
                 SwerveControllerType.PID;
 
+        public static final boolean USE_AUTO = false;
+
         public static final RobotConfig PATHPLANNER_CONFIG;
 
         static {
+            RobotConfig config;
             try {
-                PATHPLANNER_CONFIG = RobotConfig.fromGUISettings();
+                config = RobotConfig.fromGUISettings();
             } catch (IOException | ParseException e) {
-                throw new RuntimeException("Failed to get pathplanner config!", e);
+                if(USE_AUTO) throw new RuntimeException("Failed to get pathplanner config!", e);
+                else config = null;
             }
+
+            PATHPLANNER_CONFIG = config;
         }
 
         /**

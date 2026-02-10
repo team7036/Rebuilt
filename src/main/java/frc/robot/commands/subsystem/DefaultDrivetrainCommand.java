@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drive.Drivetrain;
 
 import java.util.function.BooleanSupplier;
@@ -11,26 +12,20 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 public class DefaultDrivetrainCommand extends Command {
+    private static final Function<Double, SlewRateLimiter> RATE_LIMITER_FACTORY = SlewRateLimiter::new;
 
     private final Drivetrain drivetrain;
 
-    private final DoubleSupplier leftX, leftY, rightX;
-    private final BooleanSupplier half;
+    private final CommandXboxController driveController;
 
-    public DefaultDrivetrainCommand(
-            Drivetrain drivetrain,
-            DoubleSupplier leftX,
-            DoubleSupplier leftY,
-            DoubleSupplier rightX,
-            BooleanSupplier half
-    ) {
+    private final SlewRateLimiter xSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
+    private final SlewRateLimiter ySpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
+    private final SlewRateLimiter rotSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
+
+    public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
 
-        this.leftX = leftX;
-        this.leftY = leftY;
-        this.rightX = rightX;
-
-        this.half = half;
+        this.driveController = driveController;
 
         this.setName("DefaultDTCommand");
 
@@ -39,19 +34,20 @@ public class DefaultDrivetrainCommand extends Command {
 
     @Override
     public void execute() {
+        double leftX = this.driveController.getLeftX();
+        double leftY = this.driveController.getLeftY();
+        double rightX = this.driveController.getRightX();
 
-        SlewRateLimiter xSpeedLimiter = new SlewRateLimiter(3.0);
-        SlewRateLimiter ySpeedLimiter = new SlewRateLimiter(3.0);
-        SlewRateLimiter zSpeedLimiter = new SlewRateLimiter(3.0);
+        boolean half = this.driveController.rightBumper().getAsBoolean();
 
         double maxSpeed = this.drivetrain.maxSpeed();
 
-        double xSpeed = (half.getAsBoolean() ? maxSpeed / 2 : maxSpeed)
-                * xSpeedLimiter.calculate(MathUtil.applyDeadband(leftX.getAsDouble(), 0.04));
-        double ySpeed = (half.getAsBoolean() ? maxSpeed / 2 : maxSpeed)
-                * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY.getAsDouble(), 0.04));
-        double rot = (half.getAsBoolean() ? (double) 20 / 2 : 20)
-                * -zSpeedLimiter.calculate(MathUtil.applyDeadband(rightX.getAsDouble(), 0.04));
+        double xSpeed = (half ? maxSpeed / 2 : maxSpeed)
+                * xSpeedLimiter.calculate(MathUtil.applyDeadband(leftX, 0.04));
+        double ySpeed = (half ? maxSpeed / 2 : maxSpeed)
+                * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY, 0.04));
+        double rot = (half ? (double) 20 / 2 : 20)
+                * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
 
         this.drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, rot));
 

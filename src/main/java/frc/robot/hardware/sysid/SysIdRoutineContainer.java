@@ -67,10 +67,6 @@ public class SysIdRoutineContainer {
         return !this.motors.isEmpty();
     }
 
-    public SubRoutineResults consolidateResults() {
-        return null;
-    }
-
     // Routine Wrappers
 
     private void driveMotors(Voltage voltage) {
@@ -96,10 +92,6 @@ public class SysIdRoutineContainer {
                     () -> routine.runRoutine(type, dir)
             );
         }
-    }
-
-    public record SubRoutineResults() {
-
     }
 
     record RoutineMotor(SysIdMotor sysIdMotor, boolean isTurn) {}
