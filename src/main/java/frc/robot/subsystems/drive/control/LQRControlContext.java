@@ -5,13 +5,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
 import frc.robot.Constants;
 
 public class LQRControlContext implements ControlContext {
     private final LinearSystemLoop<N1, N1, N1> driveLoop;
-    private final LinearSystemLoop<N1, N1, N1> turnLoop;
+    private final LinearSystemLoop<N2, N1, N2> turnLoop;
 
     public LQRControlContext() {
         LinearSystem<N1, N1, N1> drivePlant = Constants.Swerve.LQR.DRIVE.createSystem();
@@ -43,23 +44,23 @@ public class LQRControlContext implements ControlContext {
                         Constants.Swerve.LQR.DT
                 );
 
-        LinearSystem<N1, N1, N1> turnPlant = Constants.Swerve.LQR.TURN.createSystem();
+        LinearSystem<N2, N1, N2> turnPlant = Constants.Swerve.LQR.TURN.createSystem();
 
-        LinearQuadraticRegulator<N1, N1, N1> turnLqr =
+        LinearQuadraticRegulator<N2, N1, N2> turnLqr =
                 new LinearQuadraticRegulator<>(
                         turnPlant,
-                        VecBuilder.fill(1.5),
-                        VecBuilder.fill(15.0),
+                        VecBuilder.fill(1.5, 0.2),   // Q: [pos, vel] penalties
+                        VecBuilder.fill(12.0),       // R: voltage penalty
                         Constants.Swerve.LQR.DT
                 );
 
-        KalmanFilter<N1, N1, N1> turnObserver =
+        KalmanFilter<N2, N1, N2> turnObserver =
                 new KalmanFilter<>(
-                        Nat.N1(),
-                        Nat.N1(),
+                        Nat.N2(),    // states
+                        Nat.N2(),    // outputs (position AND velocity)
                         turnPlant,
-                        VecBuilder.fill(0.1),
-                        VecBuilder.fill(0.02),
+                        VecBuilder.fill(0.1, 1.0),   // model noise for [pos, vel]
+                        VecBuilder.fill(0.02, 0.5),  // measurement noise for [pos, vel]
                         Constants.Swerve.LQR.DT
                 );
 
@@ -74,23 +75,29 @@ public class LQRControlContext implements ControlContext {
     }
 
     @Override
-    public double calculate(double input, double state, boolean isTurn) {
-        LinearSystemLoop<N1, N1, N1> loop =
-                isTurn ? turnLoop : driveLoop;
+    public double calculate(double input, double state, double velocity, boolean isTurn) {
+        if (isTurn) {
+            turnLoop.setNextR(VecBuilder.fill(input, 0.0));
 
-        loop.setNextR(VecBuilder.fill(input));
+            turnLoop.correct(VecBuilder.fill(state, velocity));
 
-        loop.correct(VecBuilder.fill(state));
+            turnLoop.predict(Constants.Swerve.LQR.DT);
 
-        loop.predict(Constants.Swerve.LQR.DT);
+            return Math.max(-12, Math.min(turnLoop.getU(0), 12));
+        } else {
+            driveLoop.setNextR(VecBuilder.fill(input));
+            driveLoop.correct(VecBuilder.fill(state));
+            driveLoop.predict(Constants.Swerve.LQR.DT);
 
-        return Math.max(-12, Math.min(loop.getU(0), 12));
+            return Math.max(-12, Math.min(driveLoop.getU(0), 12));
+        }
     }
+
 
 
     @Override
     public void reset() {
         driveLoop.reset(VecBuilder.fill(0.0));
-        turnLoop.reset(VecBuilder.fill(0.0));
+        turnLoop.reset(VecBuilder.fill(0.0, 0.0));
     }
 }

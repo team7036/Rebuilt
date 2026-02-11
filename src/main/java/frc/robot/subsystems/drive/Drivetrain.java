@@ -163,6 +163,15 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
         };
     }
 
+    public double[] getTurnEncoderPositions() {
+        return new double[] {
+            this.frontLeft.getTurnPosition(),
+            this.frontRight.getTurnPosition(),
+            this.backLeft.getTurnPosition(),
+            this.backRight.getTurnPosition()
+        };
+    }
+
     public void drive(ChassisSpeeds speeds) {
         this.speed.drive(speeds);
     }

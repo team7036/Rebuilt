@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -72,19 +73,17 @@ public final class Constants {
         public static class Feedforward {
             public static final FFConstants DRIVE_PID =
                     FFConstants.of(0, 1.3);
-            public static final FFConstants TURN_PID =
-                    FFConstants.of(0.13, 0);
         }
 
         /**
          * {@code LQR} contains everything related to LQR constants of swerve modules
          */
         public static class LQR {
-            public static final LQRConstants DRIVE =
-                    LQRConstants.of(2.0, 0.3);
+            public static final DriveLQRConstants DRIVE =
+                    DriveLQRConstants.of(2.0, 0.3);
 
-            public static final LQRConstants TURN =
-                    LQRConstants.of(1.0, 0.1);
+            public static final TurnLQRConstants TURN =
+                    TurnLQRConstants.of(1.0, 0.1);
 
             public static final double DT = 0.02;
         }
@@ -97,26 +96,30 @@ public final class Constants {
             public static final SwerveModuleConstants FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT;
             public static final Translation2d FL_POS, FR_POS, BL_POS, BR_POS;
             static {
-                //Todo find values for turn encoders
+                //Todo find offsets for turn encoders
                 FRONT_LEFT = SwerveModuleConstants.of(
                         10,
                         11,
+                        0,
                         0
                 );
                 FRONT_RIGHT = SwerveModuleConstants.of(
                         13,
                         14,
-                        1
+                        1,
+                        0
                 );
                 BACK_LEFT = SwerveModuleConstants.of(
                         15,
                         16,
-                        3
+                        3,
+                        0
                 );
                 BACK_RIGHT = SwerveModuleConstants.of(
                         17,
                         18,
-                        4
+                        4,
+                        0
                 );
                 FL_POS = new Translation2d(
                         0.1715,
@@ -178,29 +181,41 @@ public final class Constants {
         }
     }
 
-    public record LQRConstants(double v, double a, LazyValue<LinearSystem<N1, N1, N1>> lqrLazy) {
+    public record DriveLQRConstants(double v, double a, LazyValue<LinearSystem<N1, N1, N1>> lqrLazy) {
         public LinearSystem<N1, N1, N1> createSystem() {
             return this.lqrLazy.get();
         }
 
-        public static LQRConstants of(double v, double a) {
-            return new LQRConstants(
+        public static DriveLQRConstants of(double v, double a) {
+            return new DriveLQRConstants(
                     v, a,
                     new LazyValue<>(() -> LinearSystemId
                             .identifyVelocitySystem(v, a))
             );
         }
     }
+    public record TurnLQRConstants(double v, double a, LazyValue<LinearSystem<N2, N1, N2>> lqrLazy) {
+        public LinearSystem<N2, N1, N2> createSystem() {
+            return this.lqrLazy.get();
+        }
 
-    public record SwerveModuleConstants(int driveMotorID, int turnMotorID, int turnEncoderID, LazyCachedFunction<Hardware, SwerveModuleHardware> hardwareLazy) {
+        public static TurnLQRConstants of(double v, double a) {
+            return new TurnLQRConstants(
+                    v, a,
+                    new LazyValue<>(() -> LinearSystemId.identifyPositionSystem(v, a))
+            );
+        }
+    }
+
+    public record SwerveModuleConstants(int driveMotorID, int turnMotorID, int turnEncoderID, double turnEncoderOffset, LazyCachedFunction<Hardware, SwerveModuleHardware> hardwareLazy) {
 
         public SwerveModuleHardware createHardware(Hardware hardware) {
             return hardwareLazy.get(hardware);
         }
 
-        public static SwerveModuleConstants of(int driveMotorID, int turnMotorID, int turnEncoderID) {
+        public static SwerveModuleConstants of(int driveMotorID, int turnMotorID, int turnEncoderID, double turnEncoderOffset) {
             return new SwerveModuleConstants(
-                    driveMotorID, turnMotorID, turnEncoderID,
+                    driveMotorID, turnMotorID, turnEncoderID, turnEncoderOffset,
                     new LazyCachedFunction<>((hardware) -> new SwerveModuleHardware(
                             hardware.createMotor(TalonFX.class, driveMotorID),
                             hardware.createMotor(TalonFX.class, turnMotorID),

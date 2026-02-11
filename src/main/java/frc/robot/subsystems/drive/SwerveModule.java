@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
+import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.Encoder;
 import frc.robot.hardware.Hardware;
 import frc.robot.hardware.Motor;
@@ -32,6 +33,11 @@ public class SwerveModule {
         this.turnMotor = hw.turnMotor();
         this.turnEncoder = hw.turnEncoder();
 
+        if (turnEncoder instanceof AbsoluteEncoder abs) {
+            abs.setOffset(constants.turnEncoderOffset());
+        }
+
+
         this.moduleState = new State(this);
     }
 
@@ -57,7 +63,7 @@ public class SwerveModule {
 
     public void requestState(SwerveModuleState requested) {
         requested.optimize(getRot2d());
-        requested.speedMetersPerSecond *= requested.angle.minus(getRot2d()).getCos();
+        requested.cosineScale(getRot2d());
         setDriveSpeed(requested.speedMetersPerSecond);
         setTurnPos(requested.angle.getRadians());
     }
@@ -69,11 +75,11 @@ public class SwerveModule {
 
     //m/s
     private void setDriveSpeed(double speed) {
-        double volts = this.context.calculate(speed, getDriveSpeed(), false);
+        double volts = this.context.calculate(speed, getDriveSpeed(), this.driveEncoder.getVelocity(), false);
         this.driveMotor.setVoltage(volts);
     }
     private void setTurnPos(double rads) {
-        double volts = this.context.calculate(rads, getTurnPosition(), true);
+        double volts = this.context.calculate(rads, getTurnPosition(), this.turnEncoder.getVelocity(), true);
         this.turnMotor.setVoltage(volts);
     }
 

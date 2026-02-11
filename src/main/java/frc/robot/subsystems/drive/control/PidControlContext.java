@@ -6,21 +6,19 @@ import frc.robot.Constants;
 
 public class PidControlContext implements ControlContext {
     private final PIDController drivePid, turnPid;
-    private final SimpleMotorFeedforward driveFF, turnFF;
+    private final SimpleMotorFeedforward driveFF;
 
     public PidControlContext() {
         this.drivePid = Constants.Swerve.Pid.DRIVE.createController();
         this.turnPid = Constants.Swerve.Pid.TURN.createController();
 
         this.driveFF = Constants.Swerve.Feedforward.DRIVE_PID.createFeedforward();
-        this.turnFF = Constants.Swerve.Feedforward.TURN_PID.createFeedforward();
     }
 
     @Override
-    public double calculate(double input, double state, boolean turn) {
+    public double calculate(double input, double state, double velocity, boolean turn) {
         if(turn) {
-            return turnPid.calculate(state, input)
-                    + turnFF.calculate(input);
+            return turnPid.calculate(state, input);
         }
         return drivePid.calculate(state, input)
                 + driveFF.calculate(input);

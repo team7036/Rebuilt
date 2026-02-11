@@ -5,11 +5,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.Hardware;
 import frc.robot.util.periodicsv1.Periodic;
 import frc.robot.util.periodicsv1.PeriodicManager;
 
-public class WPILIBDutyCycleEncoder implements frc.robot.hardware.Encoder, Periodic {
+public class WPILIBDutyCycleEncoder implements AbsoluteEncoder, Periodic {
     private static int ID = 0;
 
     private final DutyCycleEncoder encoder;
@@ -19,6 +20,13 @@ public class WPILIBDutyCycleEncoder implements frc.robot.hardware.Encoder, Perio
     private double lastAngle;
 
     private double curAngularVel;
+
+    private double accumulatedAngle = 0.0;
+    private double lastRawAngle = 0.0;
+    private boolean initialized = false;
+
+    private double offsetRadians = 0.0;
+
 
     public WPILIBDutyCycleEncoder(DutyCycleEncoder encoder) {
         this.encoder = encoder;
@@ -33,12 +41,29 @@ public class WPILIBDutyCycleEncoder implements frc.robot.hardware.Encoder, Perio
 
     @Override
     public double getPosition() {
-        return encoder.get() * Math.PI * 2; //Percentage -> radians
+        double raw = encoder.get() * 2.0 * Math.PI;
+
+        if (!initialized) {
+            lastRawAngle = raw;
+            initialized = true;
+        }
+
+        double delta = MathUtil.angleModulus(raw - lastRawAngle);
+        accumulatedAngle += delta;
+
+        lastRawAngle = raw;
+
+        return MathUtil.angleModulus(accumulatedAngle - offsetRadians);
     }
 
     @Override
     public double getVelocity() {
         return curAngularVel;
+    }
+
+    @Override
+    public void setOffset(double offsetRadians) {
+        this.offsetRadians = offsetRadians;
     }
 
     public static WPILIBDutyCycleEncoder of(Hardware hardware, int dioPort) {

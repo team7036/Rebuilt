@@ -7,6 +7,9 @@ import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
 import frc.robot.hardware.Hardware;
 import frc.robot.hardware.impl.HardwareImpl;
 import frc.robot.subsystems.ExampleSubsystem;
+
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,8 +30,7 @@ public class RobotContainer {
     private final MessageBus messageBus;
 
     public RobotContainer(Robot robot) {
-        this.hardware = new Hardware();
-        HardwareImpl.register(this.hardware);
+        this.hardware = robot.getHardware();
         this.messageBus = new MessageBus(MessageBus.MessageExecutorType.SINGLE);
 
         this.drivetrain = new Drivetrain(this);
@@ -38,12 +40,14 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        drivetrain.setDefaultCommand(
-                new DefaultDrivetrainCommand(
-                        drivetrain,
-                        this.driverController
-                )
-        );
+        // drivetrain.setDefaultCommand(
+        //         new DefaultDrivetrainCommand(
+        //                 drivetrain,
+        //                 this.driverController
+        //         )
+        // );
+
+        System.out.println(Arrays.toString(this.drivetrain.getTurnEncoderPositions()));
     }
 
     public Command getAutonomousCommand() {
