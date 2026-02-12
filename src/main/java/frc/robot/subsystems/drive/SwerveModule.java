@@ -1,44 +1,29 @@
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
-import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.Encoder;
-import frc.robot.hardware.Hardware;
-import frc.robot.hardware.Motor;
-import frc.robot.hardware.sysid.SysIdRoutineContainer;
-import frc.robot.subsystems.drive.control.ControlContext;
-import frc.robot.subsystems.drive.control.LQRControlContext;
-import frc.robot.subsystems.drive.control.PidControlContext;
+import frc.robot.Constants.SwerveConfig;
 
 public class SwerveModule {
-    private final ControlContext context;
+    private final PIDController pid;
 
-    private final Motor driveMotor, turnMotor;
-    private final Encoder driveEncoder, turnEncoder;
+    private final TalonFX driveMotor, turnMotor;
+    private final AbsoluteEncoder turnEncoder;
+    private final RelativeEncoder driveEncoder;
 
     private final State moduleState;
 
-    public SwerveModule(Hardware hardware, Constants.SwerveModuleConstants constants) {
-        this.context = switch(Constants.Swerve.CONTROLLER_TYPE) {
-            case LQR -> new LQRControlContext();
-            case PID -> new PidControlContext();
-        };
-
-        Constants.SwerveModuleHardware hw = constants.createHardware(hardware);
-        this.driveMotor = hw.driveMotor();
-        this.driveEncoder = this.driveMotor.getEncoder();
-        this.turnMotor = hw.turnMotor();
-        this.turnEncoder = hw.turnEncoder();
-
-        if (turnEncoder instanceof AbsoluteEncoder abs) {
-            abs.setOffset(constants.turnEncoderOffset());
-        }
-
-
-        this.moduleState = new State(this);
+    public SwerveModule(int driveCANId, int turnCANId) {
+        pid = new PIDController(1,0,0);
+        driveMotor = new TalonFX(driveCANId);
+        turnMotor = new TalonFX(turnCANId);
     }
 
     //Radians
@@ -74,7 +59,9 @@ public class SwerveModule {
     }
 
     public void test() {
-        this.driveMotor.setVoltage(1);
+        //this.driveMotor.setVoltage(1);
+        //this.turnMotor.setVoltage(1);
+        this.setTurnPos(0);
     }
 
     //m/s
@@ -83,7 +70,9 @@ public class SwerveModule {
         this.driveMotor.setVoltage(volts);
     }
     private void setTurnPos(double rads) {
-        double volts = this.context.calculate(rads, getTurnPosition(), this.turnEncoder.getVelocity(), true);
+        double volts = this.context.calculate(
+            rads, getTurnPosition(), this.turnEncoder.getVelocity(), true
+        );
         this.turnMotor.setVoltage(volts);
     }
 

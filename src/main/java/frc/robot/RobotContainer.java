@@ -1,69 +1,31 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
-import frc.robot.hardware.Hardware;
-import frc.robot.hardware.impl.HardwareImpl;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drive.Drivetrain;
-import frc.robot.util.messagingv1.MessageBus;
-import frc.robot.util.messagingv1.MessageChannel;
-
-import java.util.Arrays;
 
 public class RobotContainer {
-    private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
     private final CommandXboxController driverController =
             new CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-    private final Hardware hardware;
 
-    private final Drivetrain drivetrain;
-
-    private final MessageBus messageBus;
-
-    public RobotContainer(Robot robot) {
-        this.hardware = robot.getHardware();
-        this.messageBus = new MessageBus(MessageBus.MessageExecutorType.SINGLE);
-
-        this.drivetrain = new Drivetrain(this);
-
+    private final Drivetrain drivetrain = new Drivetrain();
+    public RobotContainer() {
         configureBindings();
     }
 
     private void configureBindings() {
 
-        drivetrain.setDefaultCommand(
-                new DefaultDrivetrainCommand(
-                        drivetrain,
-                        this.driverController
-                )
-        );
+        // drivetrain.setDefaultCommand(
+        //         new DefaultDrivetrainCommand(
+        //                 drivetrain,
+        //                 this.driverController
+        //         )
+        // );
 
         //System.out.println(Arrays.toString(this.drivetrain.getEncoderValues()));
 
-        //this.drivetrain.testModules();
-    }
-
-    public Command getAutonomousCommand() {
-        return Autos.exampleAuto(exampleSubsystem);
-    }
-
-    public Hardware getHardware() {
-        return this.hardware;
-    }
-
-    public MessageChannel createChannel(String channelId, MessageChannel.MessageReceiver receiver) {
-        return new MessageChannel(
-                this.messageBus,
-                channelId,
-                receiver
-        );
+        this.drivetrain.testModules();
     }
 }

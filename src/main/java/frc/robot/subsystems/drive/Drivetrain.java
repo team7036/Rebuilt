@@ -11,18 +11,14 @@ import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SwerveConfig;
 import frc.robot.RobotContainer;
 import frc.robot.hardware.Gyro;
 import frc.robot.hardware.Hardware;
-import frc.robot.hardware.sysid.SysIdRoutine;
-import frc.robot.hardware.sysid.SysIdRoutineContainer;
-import frc.robot.util.messagingv1.MessageChannel;
-import frc.robot.util.messagingv1_1.MessageChannelOwner;
-
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
+public class Drivetrain extends SubsystemBase {
 
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
@@ -36,21 +32,10 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
 
     private boolean fieldRelative = false;
 
-    private final MessageChannel channel;
+    public Drivetrain() {
 
-    private final SysIdRoutineContainer sysIdContainer;
-    private final SysIdRoutine sysIdRoutine;
+        frontLeft = new SwerveModule( new SwerveConfig(0, 0) );
 
-
-    public Drivetrain(RobotContainer container) {
-        Hardware hardware = container.getHardware();
-
-        this.frontLeft = new SwerveModule(hardware, Constants.Swerve.Hardware.FRONT_LEFT);
-        this.frontRight = new SwerveModule(hardware, Constants.Swerve.Hardware.FRONT_RIGHT);
-        this.backLeft = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_LEFT);
-        this.backRight = new SwerveModule(hardware, Constants.Swerve.Hardware.BACK_RIGHT);
-
-        this.gyro = hardware.createGyro(ADXRS450_Gyro.class, 0); //Replace with ACTUAL gyro creation
 
         this.kinematics = new SwerveDriveKinematics(
                 Constants.Swerve.Hardware.FL_POS,
@@ -87,71 +72,6 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
 
         this.resetGyro();
 
-        PathFollowingController pathController = switch(Constants.Swerve.CONTROLLER_TYPE) {
-            case PID -> new PPHolonomicDriveController(
-                    Constants.Swerve.Pid.DRIVE.toPathPlannerConstants(),
-                    Constants.Swerve.Pid.TURN.toPathPlannerConstants()
-            );
-            case LQR -> new PPLTVController(
-                    Constants.Swerve.LQR.DT,
-                    this.speed.maxSpeed()
-            );
-        };
-
-
-        if(Constants.Swerve.USE_AUTO)
-            AutoBuilder.configure(
-                    this.estimation::estimatePose,
-                    this.estimation::resetPose,
-                    this.speed::robotRelative,
-                    this.speed::driveRobotRelative,
-                    pathController,
-                    Constants.Swerve.PATHPLANNER_CONFIG,
-                    () -> true,
-                    this
-            );
-
-        this.channel = container.createChannel(
-                "subsystem/drivetrain",
-                new DrivetrainMessageHandler(this)
-        );
-
-        //Setup SysIdRoutineContainer with motors
-
-        this.sysIdContainer = new SysIdRoutineContainer();
-        this.frontLeft.populateContainer("FL", this.sysIdContainer);
-        this.frontRight.populateContainer("FR", this.sysIdContainer);
-        this.backLeft.populateContainer("BL", this.sysIdContainer);
-        this.backRight.populateContainer("BR", this.sysIdContainer);
-
-        //Setup and Complete SysIdRoutine with test runs
-
-        this.sysIdRoutine = new SysIdRoutine();
-        this.sysIdRoutine.addRoutine(
-                SysIdRoutineContainer.BuiltSubRoutine.build(
-                        this.sysIdContainer,
-                        SysIdRoutineContainer.RoutineType.QUASISTATIC,
-                        SysIdRoutineContainer.Direction.FORWARD
-                )
-        ).addRoutine(
-                SysIdRoutineContainer.BuiltSubRoutine.build(
-                        this.sysIdContainer,
-                        SysIdRoutineContainer.RoutineType.QUASISTATIC,
-                        SysIdRoutineContainer.Direction.BACKWARD
-                )
-        ).addRoutine(
-                SysIdRoutineContainer.BuiltSubRoutine.build(
-                        this.sysIdContainer,
-                        SysIdRoutineContainer.RoutineType.DYNAMIC,
-                        SysIdRoutineContainer.Direction.FORWARD
-                )
-        ).addRoutine(
-                SysIdRoutineContainer.BuiltSubRoutine.build(
-                        this.sysIdContainer,
-                        SysIdRoutineContainer.RoutineType.DYNAMIC,
-                        SysIdRoutineContainer.Direction.BACKWARD
-                )
-        );
     }
 
     private SwerveModulePosition[] getPositions() {
@@ -187,10 +107,6 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
         return this.speed.maxSpeed();
     }
 
-    public SysIdRoutine sysIdRoutine() {
-        return this.sysIdRoutine;
-    }
-
     private Rotation2d getAngle() {
         return Rotation2d.fromRadians(this.gyro.getAngle());
     }
@@ -205,11 +121,6 @@ public class Drivetrain extends SubsystemBase implements MessageChannelOwner {
 
     void addVisionEstimation(Pose2d visionPose, double timestamp) {
         this.estimation.addVisionEstimation(visionPose, timestamp);
-    }
-
-    @Override
-    public MessageChannel getChannel() {
-        return this.channel;
     }
 
     record Estimation(SwerveDrivePoseEstimator estimator, SwerveDriveOdometry odometry) {
