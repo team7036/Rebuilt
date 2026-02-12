@@ -7,15 +7,14 @@ import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
 import frc.robot.hardware.Hardware;
 import frc.robot.hardware.impl.HardwareImpl;
 import frc.robot.subsystems.ExampleSubsystem;
-
-import java.util.Arrays;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drive.Drivetrain;
 import frc.robot.util.messagingv1.MessageBus;
 import frc.robot.util.messagingv1.MessageChannel;
+
+import java.util.Arrays;
 
 public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
@@ -40,14 +39,16 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        // drivetrain.setDefaultCommand(
-        //         new DefaultDrivetrainCommand(
-        //                 drivetrain,
-        //                 this.driverController
-        //         )
-        // );
+        drivetrain.setDefaultCommand(
+                new DefaultDrivetrainCommand(
+                        drivetrain,
+                        this.driverController
+                )
+        );
 
-        System.out.println(Arrays.toString(this.drivetrain.getTurnEncoderPositions()));
+        //System.out.println(Arrays.toString(this.drivetrain.getEncoderValues()));
+
+        //this.drivetrain.testModules();
     }
 
     public Command getAutonomousCommand() {

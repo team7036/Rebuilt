@@ -80,7 +80,9 @@ public class WPILIBDutyCycleEncoder implements AbsoluteEncoder, Periodic {
         double dA = MathUtil.angleModulus(curAngle - lastAngle); //deltaAngle
         double dT = curTime - lastTime; //deltaTime
 
-        curAngularVel = velocityFilter.calculate(dA/dT);
+        if (dT > 1e-5) {
+            curAngularVel = velocityFilter.calculate(dA / dT);
+        }
 
         lastAngle = curAngle;
         lastTime = curTime;

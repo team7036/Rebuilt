@@ -73,6 +73,10 @@ public class SwerveModule {
                 .addTurnMotor(prefix + "T", this.turnMotor, this.turnEncoder);
     }
 
+    public void test() {
+        this.driveMotor.setVoltage(1);
+    }
+
     //m/s
     private void setDriveSpeed(double speed) {
         double volts = this.context.calculate(speed, getDriveSpeed(), this.driveEncoder.getVelocity(), false);

@@ -95,6 +95,8 @@ public final class Constants {
         public static class Hardware {
             public static final SwerveModuleConstants FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT;
             public static final Translation2d FL_POS, FR_POS, BL_POS, BR_POS;
+            //Calculated via scaling last year's translations based on the 120 in -> 110 in perimeter change.
+            private static final double HALF_SIDE_METERS = 0.34925;
             static {
                 //Todo find offsets for turn encoders
                 FRONT_LEFT = SwerveModuleConstants.of(
@@ -121,22 +123,12 @@ public final class Constants {
                         4,
                         0
                 );
-                FL_POS = new Translation2d(
-                        0.1715,
-                        0.1715
-                );
-                FR_POS = new Translation2d(
-                        0.1715,
-                        -0.1715
-                );
-                BL_POS = new Translation2d(
-                        -0.1715,
-                        0.1715
-                );
-                BR_POS = new Translation2d(
-                        -0.1715,
-                        -0.1715
-                );
+
+                FL_POS = new Translation2d(+HALF_SIDE_METERS, +HALF_SIDE_METERS);
+                FR_POS = new Translation2d(+HALF_SIDE_METERS, -HALF_SIDE_METERS);
+                BL_POS = new Translation2d(-HALF_SIDE_METERS, +HALF_SIDE_METERS);
+                BR_POS = new Translation2d(-HALF_SIDE_METERS, -HALF_SIDE_METERS);
+
             }
         }
     }

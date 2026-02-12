@@ -22,8 +22,12 @@ public class DefaultDrivetrainCommand extends Command {
     private final SlewRateLimiter ySpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
     private final SlewRateLimiter rotSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
 
+    private final double maxSpeed, maxAngularSpeed;
+
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
+        this.maxSpeed = this.drivetrain.maxSpeed();
+        this.maxAngularSpeed = this.maxSpeed / 0.34925;
 
         this.driveController = driveController;
 
@@ -40,13 +44,11 @@ public class DefaultDrivetrainCommand extends Command {
 
         boolean half = this.driveController.rightBumper().getAsBoolean();
 
-        double maxSpeed = this.drivetrain.maxSpeed();
-
         double xSpeed = (half ? maxSpeed / 2 : maxSpeed)
                 * xSpeedLimiter.calculate(MathUtil.applyDeadband(leftX, 0.04));
         double ySpeed = (half ? maxSpeed / 2 : maxSpeed)
                 * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY, 0.04));
-        double rot = (half ? (double) 20 / 2 : 20)
+        double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
 
         this.drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, rot));
