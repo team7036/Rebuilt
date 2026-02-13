@@ -3,28 +3,41 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Constants;
+import frc.robot.Constants.Swerve;
+import frc.robot.custom.TalonFXEncoder;
 
 public class SwerveModule {
-    private final PIDController pid;
+
+    private final PIDController turnPid;
+    private final SimpleMotorFeedforward driveFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
+    private final Encoder driveEncoder;
     private final DutyCycleEncoder turnEncoder;
-    private final DutyCycleEncoder driveEncoder;
-    private final State moduleState;
 
-    public SwerveModule(int driveMotorId, int driveEncoderId, int turnCANId, int turnEncoderPin) {
-        pid = new PIDController(1,0,0);
-        driveMotor = new TalonFX(driveMotorId);
-        driveEncoder = new DutyCycleEncoder(driveEncoderId);
-        turnMotor = new TalonFX(turnCANId);
-        turnEncoder = new DutyCycleEncoder(turnEncoderPin);
-        moduleState = new State(null)
+    public SwerveModule(Swerve.IDs ids) {
+        // Control
+        turnPid = new PIDController(
+            Constants.Swerve.Control.TurnPID.kP, 
+            Constants.Swerve.Control.TurnPID.kI,
+            Constants.Swerve.Control.TurnPID.kD
+        );
+        driveFeedforward = new SimpleMotorFeedforward(
+            Constants.Swerve.Control.DriveFeedforward.kS, 
+            Constants.Swerve.Control.DriveFeedforward.kV
+        );
+        // Hardware
+        driveMotor = new TalonFX(ids.driveMotorId);
+        driveEncoder = new TalonFXEncoder(driveMotor);
+        turnMotor = new TalonFX(ids.turnMotorId);
+        turnEncoder = new DutyCycleEncoder(ids.turnEncoderId);
     }
 
     //Radians
@@ -36,15 +49,7 @@ public class SwerveModule {
     }
     // speed m/s
     public double getDriveSpeed() {
-        return this.driveEncoder.getVelocity();
-    }
-    
-    public State getModuleState() {
-        return this.moduleState;
-    }
-
-    public double getMaxSpeed() {
-        return this.driveMotor.getMaxSpeed();
+        return this.driveEncoder.getRate();
     }
 
     public void requestState(SwerveModuleState requested) {
@@ -54,45 +59,24 @@ public class SwerveModule {
         setTurnPos(requested.angle.getRadians());
     }
 
-    public void populateContainer(String prefix, SysIdRoutineContainer container) {
-        container.addDriveMotor(prefix + "D", this.driveMotor)
-                .addTurnMotor(prefix + "T", this.turnMotor, this.turnEncoder);
-    }
-
-    public void test() {
-        //this.driveMotor.setVoltage(1);
-        //this.turnMotor.setVoltage(1);
-        this.setTurnPos(0);
-    }
-
     //m/s
     private void setDriveSpeed(double speed) {
-        double volts = this.context.calculate(speed, getDriveSpeed(), this.driveEncoder.getVelocity(), false);
+        double volts = driveFeedforward.calculate(speed);
         this.driveMotor.setVoltage(volts);
     }
+
     private void setTurnPos(double rads) {
-        double volts = this.context.calculate(
-            rads, getTurnPosition(), this.turnEncoder.getVelocity(), true
-        );
+        double volts = turnPid.calculate(getTurnPosition(), rads);
         this.turnMotor.setVoltage(volts);
     }
 
-    private Encoder getDriveEncoder() {
-        return driveEncoder;
+    public SwerveModulePosition getPosition(){
+        return new SwerveModulePosition(
+            driveEncoder.getDistance(), new Rotation2d(getTurnPosition())
+        );
     }
 
-    public record State(SwerveModule module) {
-        public SwerveModulePosition asPosition() {
-            return new SwerveModulePosition(
-                    module.getDriveEncoder().getPosition(),
-                    module.getRot2d()
-            );
-        }
-        public SwerveModuleState asState() {
-            return new SwerveModuleState(
-                    module.getDriveSpeed(),
-                    module.getRot2d()
-            );
-        }
+    public SwerveModuleState getModuleState(){
+        return null;
     }
 }
