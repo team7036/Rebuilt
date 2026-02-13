@@ -5,29 +5,43 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import frc.robot.util.LazyCachedFunction;
-import frc.robot.util.LazyValue;
-import org.json.simple.parser.ParseException;
-
-import java.io.IOException;
 
 public final class Constants {
-    public static class SwerveConfig {
-        public int driveCANId;
-        public int turnCANId;
-        public SwerveConfig(int driveCANId, int turnCANId){
-            this.driveCANId = driveCANId;
-            this.turnCANId = turnCANId;
+
+
+    public final class Swerve {
+
+        public final class Control {
+            
+        }
+
+        public final class Kinematics {
+
+        }
+
+        public final class CAN {
+            public static class FrontLeft {
+                public static int DRIVE = 10;
+                public static int TURN = 11;
+            }
+            public static class FrontRight {
+                public static int DRIVE = 10;
+                public static int TURN = 11;
+            }
+            public static class BackLeft {
+                public static int DRIVE = 10;
+                public static int TURN = 11;
+            }
+            public static class BackRight {
+                public static int DRIVE = 10;
+                public static int TURN = 11;
+            }
+        }
+    }
+
+    public final class CAN {
+        public static class Swerve {
+            
         }
     }
 

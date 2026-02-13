@@ -7,25 +7,26 @@ import com.pathplanner.lib.controllers.PathFollowingController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConfig;
 import frc.robot.RobotContainer;
-import frc.robot.hardware.Gyro;
-import frc.robot.hardware.Hardware;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class Drivetrain extends SubsystemBase {
 
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
+    private final SwerveDriveKinematics kinematics;
+    private final SwerveDriveOdometry odometry;
 
     private final Gyro gyro;
 
-    private final SwerveDriveKinematics kinematics;
-    private final SwerveDriveOdometry odometry;
+    
 
     private final Estimation estimation;
     private final Speed speed;
@@ -34,10 +35,26 @@ public class Drivetrain extends SubsystemBase {
 
     public Drivetrain() {
 
-        frontLeft = new SwerveModule( new SwerveConfig(0, 0) );
+        frontLeft = new SwerveModule(
+            Constants.Swerve.CAN.FrontLeft.DRIVE,
+            Constants.Swerve.CAN.FrontLeft.TURN
+        );
+        frontRight = new SwerveModule(
+            Constants.Swerve.CAN.FrontRight.DRIVE,
+            Constants.Swerve.CAN.FrontRight.TURN
+        );
+        backLeft = new SwerveModule(
+            Constants.Swerve.CAN.BackLeft.DRIVE,
+            Constants.Swerve.CAN.BackLeft.TURN
+        );
+        backRight = new SwerveModule(
+            Constants.Swerve.CAN.BackRight.DRIVE,
+            Constants.Swerve.CAN.BackRight.TURN
+        );
 
 
         this.kinematics = new SwerveDriveKinematics(
+                new Transform2d(0, 1),
                 Constants.Swerve.Hardware.FL_POS,
                 Constants.Swerve.Hardware.FR_POS,
                 Constants.Swerve.Hardware.BL_POS,

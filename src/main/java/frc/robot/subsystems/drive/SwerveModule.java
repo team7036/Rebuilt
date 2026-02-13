@@ -1,34 +1,35 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Constants;
-import frc.robot.Constants.SwerveConfig;
 
 public class SwerveModule {
     private final PIDController pid;
 
     private final TalonFX driveMotor, turnMotor;
-    private final AbsoluteEncoder turnEncoder;
-    private final RelativeEncoder driveEncoder;
-
+    private final DutyCycleEncoder turnEncoder;
+    private final DutyCycleEncoder driveEncoder;
     private final State moduleState;
 
-    public SwerveModule(int driveCANId, int turnCANId) {
+    public SwerveModule(int driveMotorId, int driveEncoderId, int turnCANId, int turnEncoderPin) {
         pid = new PIDController(1,0,0);
-        driveMotor = new TalonFX(driveCANId);
+        driveMotor = new TalonFX(driveMotorId);
+        driveEncoder = new DutyCycleEncoder(driveEncoderId);
         turnMotor = new TalonFX(turnCANId);
+        turnEncoder = new DutyCycleEncoder(turnEncoderPin);
+        moduleState = new State(null)
     }
 
     //Radians
     public double getTurnPosition() {
-        return this.turnEncoder.getPosition();
+        return turnEncoder.get();
     }
     public Rotation2d getRot2d() {
         return Rotation2d.fromRadians(this.getTurnPosition());

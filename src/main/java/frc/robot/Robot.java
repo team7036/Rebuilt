@@ -8,8 +8,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.hardware.Hardware;
-import frc.robot.util.periodicsv1.PeriodicManager;
 
 
 /**
@@ -23,19 +21,17 @@ public class Robot extends TimedRobot
     
     private final RobotContainer robotContainer;
 
-    private final Hardware hardware;
     
     
     /**
      * This method is run when the robot is first started up and should be used for any
      * initialization code.
      */
-    public Robot(Hardware hardware)
+    public Robot()
     {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
-        this.hardware = hardware;
-        robotContainer = new RobotContainer(this);
+        robotContainer = new RobotContainer();
     }
     
     
@@ -55,7 +51,6 @@ public class Robot extends TimedRobot
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
 
-        PeriodicManager.periodic();
     }
     
     
@@ -72,7 +67,7 @@ public class Robot extends TimedRobot
     @Override
     public void autonomousInit()
     {
-        autonomousCommand = robotContainer.getAutonomousCommand();
+        //autonomousCommand = robotContainer.getAutonomousCommand();
         
         // schedule the autonomous command (example)
         if (autonomousCommand != null)
@@ -128,7 +123,4 @@ public class Robot extends TimedRobot
     @Override
     public void simulationPeriodic() {}
 
-    public Hardware getHardware() {
-        return this.hardware;
-    }
 }
