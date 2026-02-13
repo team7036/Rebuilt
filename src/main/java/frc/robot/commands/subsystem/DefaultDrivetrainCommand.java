@@ -5,10 +5,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drivetrain;
-
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 public class DefaultDrivetrainCommand extends Command {
@@ -26,7 +24,7 @@ public class DefaultDrivetrainCommand extends Command {
 
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
-        this.maxSpeed = this.drivetrain.maxSpeed();
+        this.maxSpeed = Constants.Drivetrain.maxSpeed;
         this.maxAngularSpeed = this.maxSpeed / 0.34925;
 
         this.driveController = driveController;
@@ -51,7 +49,7 @@ public class DefaultDrivetrainCommand extends Command {
         double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
 
-        this.drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, rot));
+        this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     }
 }
