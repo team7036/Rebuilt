@@ -9,6 +9,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public final class Constants {
 
+    public final class Drivetrain {
+        public static double maxSpeed = 1.0;
+    }
+
     public final class Swerve {
 
         public static final Swerve.IDs FrontLeft = new Swerve.IDs(0, 0, 0, 0);
