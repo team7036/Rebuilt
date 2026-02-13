@@ -1,13 +1,13 @@
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.Controllers;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drive.Drivetrain;
 
 public class RobotContainer {
 
     private final CommandXboxController driverController =
-            new CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
+            new CommandXboxController(Controllers.DRIVER_PORT);
 
 
     private final Drivetrain drivetrain = new Drivetrain();

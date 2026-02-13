@@ -3,28 +3,42 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Constants;
+import frc.robot.Constants.Swerve.SwerveConfig;
 
 public class SwerveModule {
-    private final PIDController pid;
+
+    private final PIDController turnPid;
+    private final SimpleMotorFeedforward driveFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
     private final DutyCycleEncoder turnEncoder;
     private final DutyCycleEncoder driveEncoder;
     private final State moduleState;
 
-    public SwerveModule(int driveMotorId, int driveEncoderId, int turnCANId, int turnEncoderPin) {
-        pid = new PIDController(1,0,0);
-        driveMotor = new TalonFX(driveMotorId);
-        driveEncoder = new DutyCycleEncoder(driveEncoderId);
-        turnMotor = new TalonFX(turnCANId);
-        turnEncoder = new DutyCycleEncoder(turnEncoderPin);
-        moduleState = new State(null)
+    public SwerveModule(SwerveConfig config) {
+        // Control
+        turnPid = new PIDController(
+            Constants.Swerve.Control.TurnPID.kP, 
+            Constants.Swerve.Control.TurnPID.kI,
+            Constants.Swerve.Control.TurnPID.kD
+        );
+        driveFeedforward = new SimpleMotorFeedforward(
+            Constants.Swerve.Control.DriveFeedforward.kS, 
+            Constants.Swerve.Control.DriveFeedforward.kV
+        );
+        // Hardware
+        driveMotor = new TalonFX(config.driveMotorId);
+        driveEncoder = new DutyCycleEncoder(config.driveEncoderId);
+        turnMotor = new TalonFX(config.turnMotorId);
+        turnEncoder = new DutyCycleEncoder(config.turnEncoderId);
+        moduleState = new State(null);
     }
 
     //Radians
@@ -52,11 +66,6 @@ public class SwerveModule {
         requested.cosineScale(getRot2d());
         setDriveSpeed(requested.speedMetersPerSecond);
         setTurnPos(requested.angle.getRadians());
-    }
-
-    public void populateContainer(String prefix, SysIdRoutineContainer container) {
-        container.addDriveMotor(prefix + "D", this.driveMotor)
-                .addTurnMotor(prefix + "T", this.turnMotor, this.turnEncoder);
     }
 
     public void test() {

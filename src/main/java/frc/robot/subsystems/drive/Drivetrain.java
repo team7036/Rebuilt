@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.SwerveConfig;
 import frc.robot.RobotContainer;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -26,8 +25,6 @@ public class Drivetrain extends SubsystemBase {
 
     private final Gyro gyro;
 
-    
-
     private final Estimation estimation;
     private final Speed speed;
 
@@ -35,23 +32,10 @@ public class Drivetrain extends SubsystemBase {
 
     public Drivetrain() {
 
-        frontLeft = new SwerveModule(
-            Constants.Swerve.CAN.FrontLeft.DRIVE,
-            Constants.Swerve.CAN.FrontLeft.TURN
-        );
-        frontRight = new SwerveModule(
-            Constants.Swerve.CAN.FrontRight.DRIVE,
-            Constants.Swerve.CAN.FrontRight.TURN
-        );
-        backLeft = new SwerveModule(
-            Constants.Swerve.CAN.BackLeft.DRIVE,
-            Constants.Swerve.CAN.BackLeft.TURN
-        );
-        backRight = new SwerveModule(
-            Constants.Swerve.CAN.BackRight.DRIVE,
-            Constants.Swerve.CAN.BackRight.TURN
-        );
-
+        frontLeft = new SwerveModule(Constants.Swerve.FrontLeft);
+        frontRight = new SwerveModule(Constants.Swerve.FrontRight);
+        backLeft = new SwerveModule(Constants.Swerve.BackLeft);
+        backRight = new SwerveModule(Constants.Swerve.BackRight);
 
         this.kinematics = new SwerveDriveKinematics(
                 new Transform2d(0, 1),
