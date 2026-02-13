@@ -5,27 +5,35 @@
 
 package frc.robot;
 
-public final class Constants {
+import edu.wpi.first.math.geometry.Translation2d;
 
+public final class Constants {
 
     public final class Swerve {
 
-        public static final SwerveConfig FrontLeft = new SwerveConfig(0, 0, 0, 0);
-        public static final SwerveConfig FrontRight = new SwerveConfig(0, 0, 0, 0);
-        public static final SwerveConfig BackLeft = new SwerveConfig(0, 0, 0, 0);
-        public static final SwerveConfig BackRight = new SwerveConfig(0, 0, 0, 0);
+        public static final Swerve.IDs FrontLeft = new Swerve.IDs(0, 0, 0, 0);
+        public static final Swerve.IDs FrontRight = new Swerve.IDs(0, 0, 0, 0);
+        public static final Swerve.IDs BackLeft = new Swerve.IDs(0, 0, 0, 0);
+        public static final Swerve.IDs BackRight = new Swerve.IDs(0, 0, 0, 0);
 
-        public static class SwerveConfig {
+        public static class IDs {
             public final int turnMotorId;
             public final int turnEncoderId;
             public final int driveMotorId;
             public final int driveEncoderId;
-            public SwerveConfig(int turnMotorId, int turnEncoderId, int driveMotorId, int driveEncoderId){
+            public IDs(int turnMotorId, int turnEncoderId, int driveMotorId, int driveEncoderId){
                 this.turnMotorId = turnMotorId;
                 this.turnEncoderId = turnEncoderId;
                 this.driveMotorId = driveMotorId;
                 this.driveEncoderId = driveEncoderId;
             }
+        }
+
+        public static class Position {
+            public static Translation2d FrontLeft = new Translation2d();
+            public static Translation2d FrontRight = new Translation2d();
+            public static Translation2d BackLeft = new Translation2d();
+            public static Translation2d BackRight = new Translation2d();
         }
 
         public static class Control {
