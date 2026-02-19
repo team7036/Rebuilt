@@ -52,11 +52,10 @@ public class SwerveModule {
         return this.driveEncoder.getRate();
     }
 
-    public void requestState(SwerveModuleState requested) {
-        requested.optimize(getRot2d());
-        requested.cosineScale(getRot2d());
-        setDriveSpeed(requested.speedMetersPerSecond);
-        setTurnPos(requested.angle.getRadians());
+    public void setDesiredState(SwerveModuleState desiredState){
+        desiredState.optimize(getRot2d());
+        setDriveSpeed(desiredState.speedMetersPerSecond);
+        setTurnPosition(desiredState.angle.getRadians());
     }
 
     //m/s
@@ -65,7 +64,7 @@ public class SwerveModule {
         this.driveMotor.setVoltage(volts);
     }
 
-    private void setTurnPos(double rads) {
+    private void setTurnPosition(double rads) {
         double volts = turnPid.calculate(getTurnPosition(), rads);
         this.turnMotor.setVoltage(volts);
     }
@@ -74,9 +73,5 @@ public class SwerveModule {
         return new SwerveModulePosition(
             driveEncoder.getDistance(), new Rotation2d(getTurnPosition())
         );
-    }
-
-    public SwerveModuleState getModuleState(){
-        return null;
     }
 }
