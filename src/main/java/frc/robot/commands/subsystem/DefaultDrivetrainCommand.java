@@ -24,8 +24,8 @@ public class DefaultDrivetrainCommand extends Command {
 
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
-        this.maxSpeed = Constants.Drivetrain.maxSpeed;
-        this.maxAngularSpeed = this.maxSpeed / 0.34925;
+        this.maxSpeed = Constants.Drivetrain.MaxSpeed;
+        this.maxAngularSpeed = Constants.Drivetrain.MaxAngularSpeed;
 
         this.driveController = driveController;
 

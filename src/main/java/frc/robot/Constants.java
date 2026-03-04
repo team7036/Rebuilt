@@ -10,6 +10,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 public final class Constants {
 
     public final class IDs {
+
+        public final class Controllers {
+            public static int Driver = 0;
+        }
+
         public final class DIO {
             public static int FrontLeftEncoder = 0;
             public static int FrontRightEncoder = 1;
@@ -32,7 +37,8 @@ public final class Constants {
 
     public final class Drivetrain {
 
-        public static double maxSpeed = 1.0;
+        public static double MaxSpeed = 1.0;
+        public static double MaxAngularSpeed = MaxSpeed / 3.14;
     }
 
     public final class Swerve {
@@ -56,9 +62,5 @@ public final class Constants {
                 public static int kD = 0;
             }
         }
-    }
-
-    public static class Controllers {
-        public static final int DRIVER_PORT = 0;
     }
 }

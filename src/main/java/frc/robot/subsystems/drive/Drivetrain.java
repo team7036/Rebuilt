@@ -7,7 +7,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IDs;
@@ -21,7 +23,7 @@ public class Drivetrain extends SubsystemBase {
 
     private final ADXRS450_Gyro gyro;
 
-    private final double maxSpeed = Constants.Drivetrain.maxSpeed;
+    private final double maxSpeed = Constants.Drivetrain.MaxSpeed;
     private boolean fieldRelative = false;
 
     public Drivetrain() {
@@ -80,6 +82,15 @@ public class Drivetrain extends SubsystemBase {
 
     private Rotation2d getAngle() {
         return Rotation2d.fromRadians(this.gyro.getAngle());
+    }
+
+     @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("DrivetrainSubsystem");
+        builder.addDoubleProperty("pose.rotation", ()->this.getAngle().getDegrees(), null);
+        builder.addDoubleProperty("front_left.turn_position", this.frontLeft::getTurnPosition, null);
+        builder.addDoubleProperty("front_left.drive_speed", this.frontLeft::getDriveSpeed, null);
+
     }
 }
 
