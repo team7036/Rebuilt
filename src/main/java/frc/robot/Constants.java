@@ -9,29 +9,33 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public final class Constants {
 
+    public final class IDs {
+        public final class DIO {
+            public static int FrontLeftEncoder = 0;
+            public static int FrontRightEncoder = 1;
+            public static int BackLeftEncoder = 3;
+            public static int BackRightEncoder = 4;
+
+        }
+
+        public final class CAN {
+            public static int FrontLeftDrive = 10;
+            public static int FrontLeftTurn = 11;
+            public static int FrontRightDrive = 12;
+            public static int FrontRightTurn = 13;
+            public static int BackLeftDrive = 14;
+            public static int BackLeftTurn = 15;
+            public static int BackRightDrive = 16;
+            public static int BackRightTurn = 17;
+        }
+    }
+
     public final class Drivetrain {
+
         public static double maxSpeed = 1.0;
     }
 
     public final class Swerve {
-
-        public static final Swerve.IDs FrontLeft = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs FrontRight = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs BackLeft = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs BackRight = new Swerve.IDs(0, 0, 0, 0);
-
-        public static class IDs {
-            public final int turnMotorId;
-            public final int turnEncoderId;
-            public final int driveMotorId;
-            public final int driveEncoderId;
-            public IDs(int turnMotorId, int turnEncoderId, int driveMotorId, int driveEncoderId){
-                this.turnMotorId = turnMotorId;
-                this.turnEncoderId = turnEncoderId;
-                this.driveMotorId = driveMotorId;
-                this.driveEncoderId = driveEncoderId;
-            }
-        }
 
         public static class Position {
             public static Translation2d FrontLeft = new Translation2d();
@@ -45,6 +49,7 @@ public final class Constants {
                 public static int kS = 0;
                 public static int kV = 0;
             }
+
             public static class TurnPID {
                 public static int kP = 0;
                 public static int kI = 0;

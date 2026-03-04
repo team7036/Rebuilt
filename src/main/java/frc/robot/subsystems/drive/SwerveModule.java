@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve;
-import frc.robot.custom.TalonFXEncoder;
 
 public class SwerveModule {
 
@@ -19,10 +18,9 @@ public class SwerveModule {
     private final SimpleMotorFeedforward driveFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
-    private final Encoder driveEncoder;
     private final DutyCycleEncoder turnEncoder;
 
-    public SwerveModule(Swerve.IDs ids) {
+    public SwerveModule(int driveMotorId, int turnMotorId, int turnEncoderId) {
         // Control
         turnPid = new PIDController(
             Constants.Swerve.Control.TurnPID.kP, 
@@ -34,10 +32,9 @@ public class SwerveModule {
             Constants.Swerve.Control.DriveFeedforward.kV
         );
         // Hardware
-        driveMotor = new TalonFX(ids.driveMotorId);
-        driveEncoder = new TalonFXEncoder(driveMotor);
-        turnMotor = new TalonFX(ids.turnMotorId);
-        turnEncoder = new DutyCycleEncoder(ids.turnEncoderId);
+        driveMotor = new TalonFX(driveMotorId);
+        turnMotor = new TalonFX(turnMotorId);
+        turnEncoder = new DutyCycleEncoder(turnEncoderId);
     }
 
     //Radians
@@ -49,7 +46,7 @@ public class SwerveModule {
     }
     // speed m/s
     public double getDriveSpeed() {
-        return this.driveEncoder.getRate();
+        return this.driveMotor.getVelocity().getValueAsDouble();
     }
 
     public void setDesiredState(SwerveModuleState desiredState){
@@ -71,7 +68,7 @@ public class SwerveModule {
 
     public SwerveModulePosition getPosition(){
         return new SwerveModulePosition(
-            driveEncoder.getDistance(), new Rotation2d(getTurnPosition())
+            driveMotor.getPosition().getValueAsDouble(), new Rotation2d(getTurnPosition())
         );
     }
 }

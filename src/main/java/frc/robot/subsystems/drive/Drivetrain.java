@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.IDs;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -25,10 +26,10 @@ public class Drivetrain extends SubsystemBase {
 
     public Drivetrain() {
 
-        frontLeft = new SwerveModule(Constants.Swerve.FrontLeft);
-        frontRight = new SwerveModule(Constants.Swerve.FrontRight);
-        backLeft = new SwerveModule(Constants.Swerve.BackLeft);
-        backRight = new SwerveModule(Constants.Swerve.BackRight);
+        frontLeft = new SwerveModule( IDs.CAN.FrontLeftDrive, IDs.CAN.FrontLeftTurn, IDs.DIO.FrontLeftEncoder );
+        frontRight = new SwerveModule(IDs.CAN.FrontRightDrive, IDs.CAN.FrontRightTurn, IDs.DIO.FrontRightEncoder);
+        backLeft = new SwerveModule(IDs.CAN.BackLeftDrive, IDs.CAN.BackLeftTurn, IDs.DIO.BackLeftEncoder);
+        backRight = new SwerveModule(IDs.CAN.BackRightDrive, IDs.CAN.BackRightTurn, IDs.DIO.BackRightEncoder);
 
         gyro = new ADXRS450_Gyro();
 
