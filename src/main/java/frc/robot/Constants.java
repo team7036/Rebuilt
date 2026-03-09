@@ -5,9 +5,9 @@
 
 package frc.robot;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 public final class Constants {
 
@@ -56,11 +56,13 @@ public final class Constants {
     }
 
     public final class Shooter {
-        // is this speed correct?
-        public static double maxSpeed = 1.0;
-        public static double stopSpeed = 0.0;
-        public static int motorChannel = 0;
-        public static MotorType motorType =  MotorType.kBrushless;
+        // max rpm of a neo
+        public static AngularVelocity maxSpeed = AngularVelocity.ofBaseUnits(5676, Units.RPM);
+        public static double thresholdRatio = 0.7;
+        public static AngularVelocity thresholdSpeed = maxSpeed.times(thresholdRatio);
+        public static int CANId = 0;
+        public static double ks = 6.0;
+        public static double kv;
     }
 
     public static class Controllers {
