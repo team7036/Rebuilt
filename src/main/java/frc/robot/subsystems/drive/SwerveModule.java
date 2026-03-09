@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -18,15 +19,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve;
 
-public class SwerveModule {
+public class SwerveModule extends SubsystemBase {
 
     private final PIDController turnPid;
     private final SimpleMotorFeedforward driveFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
     private final DutyCycleEncoder turnEncoder;
+    private final double offset;
 
-    public SwerveModule(int driveMotorId, int turnMotorId, int turnEncoderId) {
+    public SwerveModule(int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
         // Control
         turnPid = new PIDController(
             Constants.Swerve.Control.TurnPID.kP, 
@@ -38,29 +40,32 @@ public class SwerveModule {
             Constants.Swerve.Control.DriveFeedforward.kV
         );
         // Hardware
-        driveMotor = new TalonFX(driveMotorId);
-        turnMotor = new TalonFX(turnMotorId);
-        turnEncoder = new DutyCycleEncoder(turnEncoderId);
+        this.driveMotor = new TalonFX(driveMotorId);
+        this.turnMotor = new TalonFX(turnMotorId);
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId);
+
+        this.offset = offset;
     }
 
     //Radians
     public Angle getTurnPosition() {
-        return Units.Degrees.ofBaseUnits(turnEncoder.get());
+        double raw = turnEncoder.get() * Constants.Swerve.ConversionFactor + this.offset;
+        return Units.Degrees.of(raw);
     }
     public Rotation2d getRot2d() {
         return Rotation2d.fromRadians(this.getTurnPosition().in(Units.Radians));
     }
     // speed m/s
     public LinearVelocity getDriveSpeed() {
-        return Units.MetersPerSecond.ofBaseUnits(
+        return Units.MetersPerSecond.of(
             this.driveMotor.getVelocity().getValueAsDouble() / Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER
         );
     }
 
     public void setDesiredState(SwerveModuleState desiredState){
         desiredState.optimize(getRot2d());
-        setDriveSpeed(Units.MetersPerSecond.ofBaseUnits(desiredState.speedMetersPerSecond));
-        setTurnPosition(Units.Radians.ofBaseUnits(desiredState.angle.getRadians()));
+        setDriveSpeed(Units.MetersPerSecond.of(desiredState.speedMetersPerSecond));
+        setTurnPosition(Units.Radians.of(desiredState.angle.getRadians()));
     }
 
     //m/s
@@ -80,5 +85,13 @@ public class SwerveModule {
         return new SwerveModulePosition(
             driveMotor.getPosition().getValueAsDouble(), new Rotation2d(getTurnPosition())
         );
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveModule");
+        builder.addDoubleProperty("rawAngle", turnEncoder::get, null);
+        builder.addDoubleProperty("angle", ()->getTurnPosition().in(Units.Degrees), (double mag)->setTurnPosition(Angle.ofBaseUnits(mag, null)));
+        builder.addDoubleProperty("speed", ()->getDriveSpeed().magnitude(), (double mag)->setDriveSpeed(LinearVelocity.ofBaseUnits(mag, null)));
     }
 }
