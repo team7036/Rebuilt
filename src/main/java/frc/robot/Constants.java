@@ -5,6 +5,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation2d;
 
 public final class Constants {
@@ -51,6 +53,14 @@ public final class Constants {
                 public static int kD = 0;
             }
         }
+    }
+
+    public final class Shooter {
+        // is this speed correct?
+        public static double maxSpeed = 1.0;
+        public static double stopSpeed = 0.0;
+        public static int motorChannel = 0;
+        public static MotorType motorType =  MotorType.kBrushless;
     }
 
     public static class Controllers {
