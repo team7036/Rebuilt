@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.Constants.Controllers;
 import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.drive.Drivetrain;
 
 public class RobotContainer {
@@ -14,6 +15,7 @@ public class RobotContainer {
     private final Drivetrain drivetrain = new Drivetrain();
     public RobotContainer() {
         configureBindings();
+        Shooter shooter = new Shooter();
     }
 
     private void configureBindings() {
