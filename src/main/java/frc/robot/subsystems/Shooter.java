@@ -38,9 +38,9 @@ public Command stopShooterCommand()
     return runOnce(() -> this.stopShooter());
 }
 
-// @Override
-// public void initSendable(SendableBuilder builder){
-//     SmartDashboard.putData(shooterMotor);
-//     SmartDashboard.putData("motor_speed (rpm)", shooterMotor.getEncoder().getVelocity());
-// }
-// }
+
+@Override
+public void initSendable(SendableBuilder builder){
+    SmartDashboard.putNumber("motorSpeed (rpm)", shooterMotor.getEncoder().getVelocity());
+}
+}
