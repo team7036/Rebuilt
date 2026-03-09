@@ -39,6 +39,18 @@ public final class Constants {
 
         public static double MaxSpeed = 1.0;
         public static double MaxAngularSpeed = MaxSpeed / 3.14;
+
+
+        //Swerve Module Specs
+        public static final double FREE_SPEED_RPM = 6000.0; //rpm
+        public static final double FREE_SPEED_RPS = FREE_SPEED_RPM / 60.0; // 100 rps
+
+        public static final double WHEEL_DIAMETER_METERS = 0.1016; //meters, 4 inches
+        public static final double WHEEL_CIRCUMFERENCE_METERS = Math.PI * WHEEL_DIAMETER_METERS; //meters
+        public static final double DRIVE_GEAR_RATIO = 6.12;
+
+        public static final double MOTOR_ROTATIONS_PER_METER =
+            DRIVE_GEAR_RATIO / WHEEL_CIRCUMFERENCE_METERS;
     }
 
     public final class Swerve {

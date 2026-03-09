@@ -7,6 +7,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
@@ -40,31 +44,35 @@ public class SwerveModule {
     }
 
     //Radians
-    public double getTurnPosition() {
-        return turnEncoder.get();
+    public Angle getTurnPosition() {
+        return Units.Degrees.ofBaseUnits(turnEncoder.get());
     }
     public Rotation2d getRot2d() {
-        return Rotation2d.fromRadians(this.getTurnPosition());
+        return Rotation2d.fromRadians(this.getTurnPosition().in(Units.Radians));
     }
     // speed m/s
-    public double getDriveSpeed() {
-        return this.driveMotor.getVelocity().getValueAsDouble();
+    public LinearVelocity getDriveSpeed() {
+        return Units.MetersPerSecond.ofBaseUnits(
+            this.driveMotor.getVelocity().getValueAsDouble() / Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER
+        );
     }
 
     public void setDesiredState(SwerveModuleState desiredState){
         desiredState.optimize(getRot2d());
-        setDriveSpeed(desiredState.speedMetersPerSecond);
-        setTurnPosition(desiredState.angle.getRadians());
+        setDriveSpeed(Units.MetersPerSecond.ofBaseUnits(desiredState.speedMetersPerSecond));
+        setTurnPosition(Units.Radians.ofBaseUnits(desiredState.angle.getRadians()));
     }
 
     //m/s
-    private void setDriveSpeed(double speed) {
-        double volts = driveFeedforward.calculate(speed);
+    private void setDriveSpeed(LinearVelocity speed) {
+        double mps = speed.in(Units.MetersPerSecond);
+        double volts = driveFeedforward.calculate(mps);
         this.driveMotor.setVoltage(volts);
     }
-
-    private void setTurnPosition(double rads) {
-        double volts = turnPid.calculate(getTurnPosition(), rads);
+    
+    private void setTurnPosition(Angle angle) {
+        double rads = angle.in(Units.Radians);
+        double volts = turnPid.calculate(getTurnPosition().in(Units.Radians), rads);
         this.turnMotor.setVoltage(volts);
     }
 

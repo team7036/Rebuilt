@@ -7,6 +7,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -88,8 +90,12 @@ public class Drivetrain extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("DrivetrainSubsystem");
         builder.addDoubleProperty("pose.rotation", ()->this.getAngle().getDegrees(), null);
-        builder.addDoubleProperty("front_left.turn_position", this.frontLeft::getTurnPosition, null);
-        builder.addDoubleProperty("front_left.drive_speed", this.frontLeft::getDriveSpeed, null);
+        builder.addDoubleProperty("front_left.turn_position", 
+        () -> this.frontLeft.getTurnPosition().in(Units.Radians),
+        null);
+        builder.addDoubleProperty("front_left.drive_speed", 
+        () -> this.frontLeft.getDriveSpeed().in(Units.MetersPerSecond)
+        , null);
 
     }
 }
