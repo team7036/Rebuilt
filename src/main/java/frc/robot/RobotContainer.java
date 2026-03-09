@@ -20,6 +20,7 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
     drivetrain = new Drivetrain();
+    this.intake = new Intake();
   }
 
   private void configureBindings() {
