@@ -87,13 +87,13 @@ public final class Constants {
             // y = m*x + b
             // Radians = slope * magnitude + offset
             //0.22047840551196013
-            public static double FrontLeft = 77;
+            public static double FrontLeft = 79.37222598;
             //0.4913601122840028
-            public static double FrontRight = 173;
+            public static double FrontRight = 176.88964042;
             //0.8514951712873793
-            public static double BackLeft = 306;
+            public static double BackLeft = 306.53826166;
             //0.10443570261089256
-            public static double BackRight = 37.5;
+            public static double BackRight = 37.59685294;
         }
 
         public static class Position {
