@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -55,8 +56,32 @@ public final class Constants {
     }
 
     public final class Swerve {
-
-        public static double ConversionFactor = -360;
+        
+        /* WHAT BI-FUNCTIONS ARE
+         * BiFunction<I1, I2, R1>
+         * I1 - Type of input 1 (For example, Double or String or any class)
+         * I2 - Type of input 2 (For example, Double or String or any class)
+         * R1 - Type of return value (For example, Double or String or any class)
+         * 
+         * EXAMPLE:
+         * 
+         * BiFunction<String, Integer, String> ADD_TO_END = (string, num) -> string+num;
+         * 
+         * Then, to call it:
+         * ADD_TO_END.apply("some string!", 53);
+         * 
+         * REMEMBER, apply requires (I1 input1, I2 input2)
+         * In this case, the apply requires I1 to be a string, which is "some string!"
+         * Similarly, I2 must be an integer, in this case 53
+         * 
+         * Which will output:
+         * "some string!53"
+         *
+        */
+        public static BiFunction<Double, Double, Double> TO_DEGREES_FROM_RAW = (raw, offset) -> {
+            return ((raw * 360) + (360 - offset)) % 360; //Raw -> Degrees -> positive offset -> wrap degrees
+        };
+       //public static double ConversionFactor = -360;
 
         public static class ConversionOffset {
             // y = m*x + b

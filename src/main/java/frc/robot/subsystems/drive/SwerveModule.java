@@ -49,7 +49,8 @@ public class SwerveModule extends SubsystemBase {
 
     //Radians
     public Angle getTurnPosition() {
-        double raw = turnEncoder.get() * Constants.Swerve.ConversionFactor + this.offset;
+        double raw = Constants.Swerve.TO_DEGREES_FROM_RAW.apply(turnEncoder.get(), this.offset);
+        //double raw = turnEncoder.get() * Constants.Swerve.ConversionFactor + this.offset;
         return Units.Degrees.of(raw);
     }
     public Rotation2d getRot2d() {
