@@ -11,6 +11,8 @@ import frc.robot.subsystems.drive.Drivetrain;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import javax.xml.xpath.XPath;
+
 public class DefaultDrivetrainCommand extends Command {
     private static final Function<Double, SlewRateLimiter> RATE_LIMITER_FACTORY = SlewRateLimiter::new;
 
@@ -50,6 +52,7 @@ public class DefaultDrivetrainCommand extends Command {
                 * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY, 0.04));
         double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
+
         this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
     }
 }

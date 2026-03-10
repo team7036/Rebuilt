@@ -41,8 +41,8 @@ public final class Constants {
 
     public final class Drivetrain {
 
-        public static double MaxSpeed = 1.0;
-        public static double MaxAngularSpeed = MaxSpeed / 3.14;
+        public static double MaxSpeed = 1.0; // m/s?
+        public static double MaxAngularSpeed = MaxSpeed; // rad/s ?
 
         // Swerve Module Specs
         public static final double FREE_SPEED_RPM = 6000.0; // rpm
@@ -110,7 +110,7 @@ public final class Constants {
             }
 
             public static class TurnPID {
-                public static double kP = 0.5;
+                public static double kP = 3;
                 public static double kI = 0;
                 public static double kD = 0;
             }

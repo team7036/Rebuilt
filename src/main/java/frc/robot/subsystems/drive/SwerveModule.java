@@ -28,6 +28,8 @@ import frc.robot.Constants.Swerve;
 public class SwerveModule extends SubsystemBase {
 
     private final PIDController turnPid;
+    private final SimpleMotorFeedforward turnFeedforward;
+    private final PIDController drivePid;
     private final SimpleMotorFeedforward driveFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
@@ -42,7 +44,9 @@ public class SwerveModule extends SubsystemBase {
             Constants.Swerve.Control.TurnPID.kI,
             Constants.Swerve.Control.TurnPID.kD
         );
-        this.turnPid.enableContinuousInput(0, 2 * Math.PI);
+        this.turnPid.enableContinuousInput(-Math.PI, Math.PI);
+        this.turnFeedforward = new SimpleMotorFeedforward(0, 0);
+        this.drivePid = new PIDController(0, 0, 0);
         this.driveFeedforward = new SimpleMotorFeedforward(
             Constants.Swerve.Control.DriveFeedforward.kS, 
             Constants.Swerve.Control.DriveFeedforward.kV
@@ -104,6 +108,6 @@ public class SwerveModule extends SubsystemBase {
         builder.addDoubleProperty("angleMeasured", ()->getTurnPosition().in(Units.Radians), null);
         builder.addDoubleProperty("angleTarget", turnPid::getSetpoint, null);
         builder.addDoubleProperty("speed", ()->getDriveSpeed().magnitude(), (double mag)->setDriveSpeed(LinearVelocity.ofBaseUnits(mag, null)));
-        SmartDashboard.putData("pid", turnPid);
+        SmartDashboard.putData("%s-pid".formatted(this.getName()), turnPid);
     }
 }
