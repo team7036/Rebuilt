@@ -1,7 +1,12 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,6 +20,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve;
@@ -29,13 +35,15 @@ public class SwerveModule extends SubsystemBase {
     private final double offset;
 
     public SwerveModule(int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
+        super("SM-"+driveMotorId);
         // Control
-        turnPid = new PIDController(
+        this.turnPid = new PIDController(
             Constants.Swerve.Control.TurnPID.kP, 
             Constants.Swerve.Control.TurnPID.kI,
             Constants.Swerve.Control.TurnPID.kD
         );
-        driveFeedforward = new SimpleMotorFeedforward(
+        this.turnPid.enableContinuousInput(0, 2 * Math.PI);
+        this.driveFeedforward = new SimpleMotorFeedforward(
             Constants.Swerve.Control.DriveFeedforward.kS, 
             Constants.Swerve.Control.DriveFeedforward.kV
         );
@@ -51,7 +59,8 @@ public class SwerveModule extends SubsystemBase {
     public Angle getTurnPosition() {
         double raw = Constants.Swerve.TO_DEGREES_FROM_RAW.apply(turnEncoder.get(), this.offset);
         //double raw = turnEncoder.get() * Constants.Swerve.ConversionFactor + this.offset;
-        return Units.Degrees.of(raw);
+        double rads = MathUtil.angleModulus(Math.toRadians(raw));
+        return Units.Radians.of(rads);
     }
     public Rotation2d getRot2d() {
         return Rotation2d.fromRadians(this.getTurnPosition().in(Units.Radians));
@@ -77,7 +86,7 @@ public class SwerveModule extends SubsystemBase {
     }
     
     private void setTurnPosition(Angle angle) {
-        double rads = angle.in(Units.Radians);
+        double rads = MathUtil.angleModulus(angle.in(Units.Radians));
         double volts = turnPid.calculate(getTurnPosition().in(Units.Radians), rads);
         this.turnMotor.setVoltage(volts);
     }
@@ -92,7 +101,9 @@ public class SwerveModule extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("SwerveModule");
         builder.addDoubleProperty("rawAngle", turnEncoder::get, null);
-        builder.addDoubleProperty("angle", ()->getTurnPosition().in(Units.Degrees), (double mag)->setTurnPosition(Angle.ofBaseUnits(mag, null)));
+        builder.addDoubleProperty("angleMeasured", ()->getTurnPosition().in(Units.Radians), null);
+        builder.addDoubleProperty("angleTarget", turnPid::getSetpoint, null);
         builder.addDoubleProperty("speed", ()->getDriveSpeed().magnitude(), (double mag)->setDriveSpeed(LinearVelocity.ofBaseUnits(mag, null)));
+        SmartDashboard.putData("pid", turnPid);
     }
 }

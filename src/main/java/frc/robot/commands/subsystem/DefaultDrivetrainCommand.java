@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drivetrain;
+
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class DefaultDrivetrainCommand extends Command {
@@ -48,8 +50,6 @@ public class DefaultDrivetrainCommand extends Command {
                 * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY, 0.04));
         double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
-
         this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
-
     }
 }

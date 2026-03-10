@@ -105,14 +105,14 @@ public final class Constants {
 
         public static class Control {
             public static class DriveFeedforward {
-                public static int kS = 0;
-                public static int kV = 0;
+                public static double kS = 0;
+                public static double kV = 1.3;
             }
 
             public static class TurnPID {
-                public static int kP = 0;
-                public static int kI = 0;
-                public static int kD = 0;
+                public static double kP = 0.5;
+                public static double kI = 0;
+                public static double kD = 0;
             }
         }
     }
