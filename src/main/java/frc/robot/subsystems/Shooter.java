@@ -80,30 +80,26 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command fireCommand(AngularVelocity speed, boolean fuelStaged){
-        // If there are Fuel Staged
-        if (fuelStaged) {
-            return this.run(
-                // spin the shooter flywheel 
-                () -> setShooterSpeed(speed)).until(
+        return this.run(
+            // spin the shooter flywheel 
+            () -> setShooterSpeed(speed)).until(
                 
-                // keep spinning until its ready
-                ()->isShooterReady()).andThen(
-                
-                // keep voltage a constant
-                () -> shooterMotor.setVoltage(getCurrentShooterVoltage())).alongWith(
+            // keep spinning until its ready
+            ()->isShooterReady()).andThen(
+            
+            // keep voltage a constant
+            () -> shooterMotor.setVoltage(getCurrentShooterVoltage())).alongWith(
 
-                this.runEnd(
-                // set staging motor speed
-                () -> {
-                    setStagingSpeed(speed);
-                },
-                // once interrupted, stop both motors
-                () -> {
-                    stopStagingCommand();
-                    stopShooterCommand();
-                }));
-        }
-        return null;
+            this.runEnd(
+            // set staging motor speed
+            () -> {
+                setStagingSpeed(speed);
+            },
+            // once interrupted, stop both motors
+            () -> {
+                stopStagingCommand();
+                stopShooterCommand();
+            })).onlyIf(()-> fuelStaged);
     }
 
     @Override
