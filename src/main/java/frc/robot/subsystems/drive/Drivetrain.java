@@ -29,15 +29,19 @@ public class Drivetrain extends SubsystemBase {
 
     private final ADXRS450_Gyro gyro;
 
-    private final double maxSpeed = Constants.Drivetrain.MaxSpeed;
+    private final double maxSpeed = Constants.Drivetrain.MAX_LINEAR_VELOCITY.in(Units.MetersPerSecond);
     private boolean fieldRelative = false;
 
     public Drivetrain() {
 
-        frontLeft = new SwerveModule(IDs.CAN.FrontLeftDrive, IDs.CAN.FrontLeftTurn, IDs.DIO.FrontLeftEncoder, Swerve.ConversionOffset.FrontLeft);
-        frontRight = new SwerveModule(IDs.CAN.FrontRightDrive, IDs.CAN.FrontRightTurn, IDs.DIO.FrontRightEncoder, Swerve.ConversionOffset.FrontRight);
-        backLeft = new SwerveModule(IDs.CAN.BackLeftDrive, IDs.CAN.BackLeftTurn, IDs.DIO.BackLeftEncoder, Swerve.ConversionOffset.BackLeft);
-        backRight = new SwerveModule(IDs.CAN.BackRightDrive, IDs.CAN.BackRightTurn, IDs.DIO.BackRightEncoder, Swerve.ConversionOffset.BackRight);
+        frontLeft = new SwerveModule("FrontLeftSwerve", IDs.CAN.FrontLeftDrive, IDs.CAN.FrontLeftTurn, IDs.DIO.FrontLeftEncoder,
+                Swerve.ConversionOffset.FrontLeft);
+        frontRight = new SwerveModule("FrontRightSwerve", IDs.CAN.FrontRightDrive, IDs.CAN.FrontRightTurn, IDs.DIO.FrontRightEncoder,
+                Swerve.ConversionOffset.FrontRight);
+        backLeft = new SwerveModule("BackLeftSwerve", IDs.CAN.BackLeftDrive, IDs.CAN.BackLeftTurn, IDs.DIO.BackLeftEncoder,
+                Swerve.ConversionOffset.BackLeft);
+        backRight = new SwerveModule("BackRightSwerve", IDs.CAN.BackRightDrive, IDs.CAN.BackRightTurn, IDs.DIO.BackRightEncoder,
+                Swerve.ConversionOffset.BackRight);
 
         gyro = new ADXRS450_Gyro();
 

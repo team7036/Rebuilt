@@ -3,33 +3,25 @@ package frc.robot.commands.subsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drivetrain;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import javax.xml.xpath.XPath;
-
 public class DefaultDrivetrainCommand extends Command {
-    private static final Function<Double, SlewRateLimiter> RATE_LIMITER_FACTORY = SlewRateLimiter::new;
-
     private final Drivetrain drivetrain;
 
     private final CommandXboxController driveController;
 
-    private final SlewRateLimiter xSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
-    private final SlewRateLimiter ySpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
-    private final SlewRateLimiter rotSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
+    private final SlewRateLimiter xSpeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter ySpeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter rotSpeedLimiter = new SlewRateLimiter(3);
 
-    private final double maxSpeed, maxAngularSpeed;
-
+    private final double maxSpeed = Constants.Drivetrain.MAX_LINEAR_VELOCITY.in(Units.MetersPerSecond);
+    private final double maxAngularSpeed = maxSpeed * Constants.Drivetrain.WHEEL_DIAMETER.div(2).in(Units.Meters);
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
-        this.maxSpeed = Constants.Drivetrain.MaxSpeed;
-        this.maxAngularSpeed = Constants.Drivetrain.MaxAngularSpeed;
 
         this.driveController = driveController;
 
@@ -52,6 +44,10 @@ public class DefaultDrivetrainCommand extends Command {
                 * -ySpeedLimiter.calculate(MathUtil.applyDeadband(leftY, 0.04));
         double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
+
+        // System.out.println("Diagnostics:");
+        // System.out.printf("INPUTS: %f, %f, %f%n", leftX, leftY, rightX);
+        // System.out.printf("RESULTS: %f, %f, %f%n", xSpeed, ySpeed, rot);
 
         this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
     }

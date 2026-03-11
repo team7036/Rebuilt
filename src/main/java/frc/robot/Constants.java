@@ -9,7 +9,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class Constants {
 
@@ -40,60 +44,30 @@ public final class Constants {
     }
 
     public final class Drivetrain {
-
-        public static double MaxSpeed = 1.0; // m/s?
-        public static double MaxAngularSpeed = MaxSpeed; // rad/s ?
-
         // Swerve Module Specs
-        public static final double FREE_SPEED_RPM = 6000.0; // rpm
-        public static final double FREE_SPEED_RPS = FREE_SPEED_RPM / 60.0; // 100 rps
+        public static final AngularVelocity FREE_SPEED_RPM = Units.RPM.of(108); // rpm
+        public static final Distance WHEEL_DIAMETER = Units.Meters.of(Units.Inches.of(4.0).in(Units.Meters)); // meters, 4 inches
+        public static final Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.times(Math.PI) ; // meters
+        public static final double DRIVE_GEAR_RATIO = 6.12; 
+        public static final LinearVelocity MAX_LINEAR_VELOCITY = FREE_SPEED_RPM.asFrequency().times(WHEEL_CIRCUMFERENCE);
+         //public static double MaxAngularSpeed = MaxSpeed / (WHEEL_DIAMETER.in(Units.Meters) / 2); // rad/s
 
-        public static final double WHEEL_DIAMETER_METERS = 0.1016; // meters, 4 inches
-        public static final double WHEEL_CIRCUMFERENCE_METERS = Math.PI * WHEEL_DIAMETER_METERS; // meters
-        public static final double DRIVE_GEAR_RATIO = 6.12;
-
-        public static final double MOTOR_ROTATIONS_PER_METER = DRIVE_GEAR_RATIO / WHEEL_CIRCUMFERENCE_METERS;
     }
 
     public final class Swerve {
-        
-        /* WHAT BI-FUNCTIONS ARE
-         * BiFunction<I1, I2, R1>
-         * I1 - Type of input 1 (For example, Double or String or any class)
-         * I2 - Type of input 2 (For example, Double or String or any class)
-         * R1 - Type of return value (For example, Double or String or any class)
-         * 
-         * EXAMPLE:
-         * 
-         * BiFunction<String, Integer, String> ADD_TO_END = (string, num) -> string+num;
-         * 
-         * Then, to call it:
-         * ADD_TO_END.apply("some string!", 53);
-         * 
-         * REMEMBER, apply requires (I1 input1, I2 input2)
-         * In this case, the apply requires I1 to be a string, which is "some string!"
-         * Similarly, I2 must be an integer, in this case 53
-         * 
-         * Which will output:
-         * "some string!53"
-         *
-        */
-        public static BiFunction<Double, Double, Double> TO_DEGREES_FROM_RAW = (raw, offset) -> {
-            return ((raw * 360) + (360 - offset)) % 360; //Raw -> Degrees -> positive offset -> wrap degrees
-        };
        //public static double ConversionFactor = -360;
 
         public static class ConversionOffset {
             // y = m*x + b
             // Radians = slope * magnitude + offset
             //0.22047840551196013
-            public static double FrontLeft = 79.37222598;
+            public static Angle FrontLeft = Units.Degrees.of(79.37222598);
             //0.4913601122840028
-            public static double FrontRight = 176.88964042;
+            public static Angle FrontRight = Units.Degrees.of(176.88964042);
             //0.8514951712873793
-            public static double BackLeft = 306.53826166;
+            public static Angle BackLeft = Units.Degrees.of(306.53826166);
             //0.10443570261089256
-            public static double BackRight = 37.59685294;
+            public static Angle BackRight = Units.Degrees.of(37.59685294);
         }
 
         public static class Position {
@@ -103,14 +77,24 @@ public final class Constants {
             public static Translation2d BackRight = new Translation2d();
         }
 
-        public static class Control {
-            public static class DriveFeedforward {
+        public static class Feedforward {
+            public static class Drive {
                 public static double kS = 0;
                 public static double kV = 1.3;
             }
-
-            public static class TurnPID {
+            public static class Turn {
+                public static double kS = 0.13;
+                public static double kV = 0;
+            }
+        }
+        public static class PID {
+            public static class Drive {
                 public static double kP = 3;
+                public static double kI = 0;
+                public static double kD = 0;
+            }
+            public static class Turn {
+                public static double kP = 1;
                 public static double kI = 0;
                 public static double kD = 0;
             }
