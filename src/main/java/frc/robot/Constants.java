@@ -9,6 +9,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public final class Constants {
 
+    public final class Storage {
+        public static int motorCanId = 0;
+    }
+
     public final class Drivetrain {
         public static double maxSpeed = 1.0;
     }
