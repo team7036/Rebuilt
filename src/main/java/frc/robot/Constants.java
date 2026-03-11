@@ -5,6 +5,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -60,9 +62,15 @@ public final class Constants {
         public static AngularVelocity maxSpeed = AngularVelocity.ofBaseUnits(5676, Units.RPM);
         public static double thresholdRatio = 0.7;
         public static AngularVelocity thresholdSpeed = maxSpeed.times(thresholdRatio);
-        public static int CANId = 0;
+        public static int shooterCANId = 0; //TODO
+        public static int stagingCANId = 1; //TODO
         public static double ks = 6.0;
         public static double kv;
+        public static double maxAmps = 100;
+        public static double ampRatio = 0.55;
+        public static double mcl = maxAmps * ampRatio;
+        public static int motorCurrentLimits = (int) mcl;
+
     }
 
     public static class Controllers {
