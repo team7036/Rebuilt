@@ -10,6 +10,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 /**
  * The Intake for the robot:
@@ -33,13 +34,21 @@ public class Intake extends SubsystemBase {
      * Constructs a new intake
      */
     public Intake() {
-        this.intakeAngleMotor = new SparkMax(0, MotorType.kBrushless);
-        this.intakeFlywheelMotor = new SparkMax(0, MotorType.kBrushless);
+        this.intakeAngleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
+        this.intakeFlywheelMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
 
         this.intakeAngleEncoder = this.intakeAngleMotor.getEncoder();
 
-        this.intakeAnglePID = new PIDController(0, 0, 0);
-        this.intakeAngleFF = new ArmFeedforward(0, 0, 0);
+        this.intakeAnglePID = new PIDController(
+            Constants.Intake.PID.kP,
+            Constants.Intake.PID.kI,
+            Constants.Intake.PID.kD
+        );
+        this.intakeAngleFF = new ArmFeedforward(
+            Constants.Intake.ArmFeedforward.kS,
+            Constants.Intake.ArmFeedforward.kG,
+            Constants.Intake.ArmFeedforward.kV
+        );
     }
 
     /**
