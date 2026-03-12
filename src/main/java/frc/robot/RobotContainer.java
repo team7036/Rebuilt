@@ -1,33 +1,30 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.Constants.Controllers;
+import frc.robot.commands.subsystem.DefaultDrivetrainCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.drive.Drivetrain;
 
 public class RobotContainer {
 
-  private Drivetrain drivetrain;
-  private Intake intake;
-  
-  private XboxController driveController = new XboxController(0);
+    private final CommandXboxController driverController =
+            new CommandXboxController(Controllers.DRIVER_PORT);
 
-  public RobotContainer() {
-    configureBindings();
-    drivetrain = new Drivetrain();
-    this.intake = new Intake();
-  }
 
-  private void configureBindings() {
-    
-  }
+    private final Drivetrain drivetrain = new Drivetrain();
+    public RobotContainer() {
+        configureBindings();
+    }
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+    private void configureBindings() {
+
+        drivetrain.setDefaultCommand(
+                new DefaultDrivetrainCommand(
+                        drivetrain,
+                        this.driverController
+                )
+        );
+
+        //System.out.println(Arrays.toString(this.drivetrain.getEncoderValues()));
+    }
 }
