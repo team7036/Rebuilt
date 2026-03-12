@@ -42,7 +42,7 @@ public class SwerveModule extends SubsystemBase {
     *
     */
     public static BiFunction<Double, Double, Double> TO_DEGREES_FROM_RAW = (raw, offset) -> {
-        return ((raw * 360) + (360 - offset)) % 360; //Raw -> Degrees -> positive offset -> wrap degrees
+        return (((raw * 360) - offset) % 360) - 180; //Raw -> Degrees -> positive offset -> wrap degrees
     };
 
     private final PIDController turnPid, drivePid;
@@ -112,8 +112,7 @@ public class SwerveModule extends SubsystemBase {
         double setpoint = MathUtil.angleModulus(angle.in(Units.Radians));
         double measurement = getTurnPosition().in(Units.Radians);
         double volts = turnPid.calculate(measurement, setpoint) + turnFeedforward.calculate(measurement);
-        //this.turnMotor.setVoltage(volts);
-        this.turnMotor.setVoltage(1);
+        this.turnMotor.setVoltage(volts);
     }
 
     public SwerveModulePosition getPosition() {
