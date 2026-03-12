@@ -80,7 +80,7 @@ public class Intake extends SubsystemBase {
     //TODO Find angle for resting angle instead of 90 degrees
     public Command setPassiveAngle() {
         return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.ofBaseUnits(90)
+            Units.Degrees.of(90)
         ));
     }
 
@@ -91,7 +91,7 @@ public class Intake extends SubsystemBase {
     //TODO Find angle for intaking angle instead of 85 degrees
     public Command setIntakingAngle() {
         return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.ofBaseUnits(85)
+            Units.Degrees.of(85)
         ));
     }
 
@@ -102,7 +102,7 @@ public class Intake extends SubsystemBase {
     //TODO Find volts for intake
     public Command startupFlywheel() {
         return this.run(() -> this.intakeFlywheelMotor.setVoltage(
-            Units.Volts.fromBaseUnits(1)
+            Units.Volts.of(1)
         ));
     }
     /**
@@ -112,7 +112,7 @@ public class Intake extends SubsystemBase {
      */
     public Command killFlywheel() {
         return this.run(() -> this.intakeFlywheelMotor.setVoltage(
-            Units.Volts.fromBaseUnits(0)
+            Units.Volts.of(0)
         ));
     }
 }
