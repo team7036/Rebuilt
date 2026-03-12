@@ -57,17 +57,23 @@ public final class Constants {
     public final class Swerve {
        //public static double ConversionFactor = -360;
 
+       public static double FullRangeOffset = 360;
+
         public static class ConversionOffset {
             // y = m*x + b
             // Radians = slope * magnitude + offset
-            //0.22047840551196013
-            public static Angle FrontLeft = Units.Degrees.of(79.37222598);
-            //0.4913601122840028
-            public static Angle FrontRight = Units.Degrees.of(176.88964042);
-            //0.8514951712873793
-            public static Angle BackLeft = Units.Degrees.of(306.53826166);
-            //0.10443570261089256
-            public static Angle BackRight = Units.Degrees.of(37.59685294);
+            //0.2927756073193902
+            //public static Angle FrontLeft = Units.Degrees.of(0.2927756073193902);
+            public static double FrontLeft = 0.2927756073193902;
+            //0.4625355115633878
+            //public static Angle FrontRight = Units.Degrees.of(0.4625355115633878);
+            public static double FrontRight = 0.4625355115633878;
+            //0.7746222193655555
+            //public static Angle BackLeft = Units.Degrees.of(0.7746222193655555);
+            public static double BackLeft = 0.7746222193655555;
+            //0.44647296116182406
+            //public static Angle BackRight = Units.Degrees.of(0.44647296116182406);
+            public static double BackRight = 0.44647296116182406;
         }
 
         public static class Position {
@@ -83,7 +89,7 @@ public final class Constants {
                 public static double kV = 1.3;
             }
             public static class Turn {
-                public static double kS = 0.13;
+                public static double kS = 0;
                 public static double kV = 0;
             }
         }
@@ -94,7 +100,7 @@ public final class Constants {
                 public static double kD = 0;
             }
             public static class Turn {
-                public static double kP = 1;
+                public static double kP = 3;
                 public static double kI = 0;
                 public static double kD = 0;
             }

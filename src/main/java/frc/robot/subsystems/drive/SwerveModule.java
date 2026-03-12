@@ -1,10 +1,7 @@
 package frc.robot.subsystems.drive;
 
-import java.util.function.BiFunction;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,40 +17,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class SwerveModule extends SubsystemBase {
-    /* WHAT BI-FUNCTIONS ARE
-    * BiFunction<I1, I2, R1>
-    * I1 - Type of input 1 (For example, Double or String or any class)
-    * I2 - Type of input 2 (For example, Double or String or any class)
-    * R1 - Type of return value (For example, Double or String or any class)
-    * 
-    * EXAMPLE:
-    * 
-    * BiFunction<String, Integer, String> ADD_TO_END = (string, num) -> string+num;
-    * 
-    * Then, to call it:
-    * ADD_TO_END.apply("some string!", 53);
-    * 
-    * REMEMBER, apply requires (I1 input1, I2 input2)
-    * In this case, the apply requires I1 to be a string, which is "some string!"
-    * Similarly, I2 must be an integer, in this case 53
-    * 
-    * Which will output:
-    * "some string!53"
-    *
-    */
-    public static BiFunction<Double, Double, Double> TO_DEGREES_FROM_RAW = (raw, offset) -> {
-        return (((raw * 360) - offset) % 360) - 180; //Raw -> Degrees -> positive offset -> wrap degrees
-    };
 
     private final PIDController turnPid, drivePid;
     private final SimpleMotorFeedforward driveFeedforward, turnFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
     private final DutyCycleEncoder turnEncoder;
-    private final Angle offset;
 
-    public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, Angle offset) {
-        super("SM-%s".formatted(moduleName));
+    public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
+        
         // Control
         this.turnPid = new PIDController(
                 Constants.Swerve.PID.Turn.kP,
@@ -74,15 +46,14 @@ public class SwerveModule extends SubsystemBase {
         // Hardware
         this.driveMotor = new TalonFX(driveMotorId);
         this.turnMotor = new TalonFX(turnMotorId);
-        this.turnEncoder = new DutyCycleEncoder(turnEncoderId);
-
-        this.offset = offset;
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, Constants.Swerve.FullRangeOffset, offset*Constants.Swerve.FullRangeOffset);
+        
     }
 
-    // Radians
     public Angle getTurnPosition() {
-        double offsetDeg = this.offset.magnitude();
-        return Units.Degrees.of(TO_DEGREES_FROM_RAW.apply(this.turnEncoder.get(), offsetDeg));
+        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder
+        double offset = Constants.Swerve.FullRangeOffset/2; // Adds possibility of negative values. For example, 90 is actuallly -90 and 270 is actually 90.
+        return Units.Degrees.of(raw - offset);
     }
 
     public Rotation2d getRot2d() {
@@ -91,6 +62,8 @@ public class SwerveModule extends SubsystemBase {
 
     // speed m/s
     public LinearVelocity getDriveSpeed() {
+        // TODO
+        // Translate the linear velocity read by the Kraken's encoder into a distance
         double angularVelocity = this.driveMotor.getVelocity().getValueAsDouble();
         return Units.MetersPerSecond.of(angularVelocity);
     }
@@ -109,10 +82,10 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private void setTurnPosition(Angle angle) {
-        double setpoint = MathUtil.angleModulus(angle.in(Units.Radians));
+        double setpoint = angle.in(Units.Radians);
         double measurement = getTurnPosition().in(Units.Radians);
         double volts = turnPid.calculate(measurement, setpoint) + turnFeedforward.calculate(measurement);
-        this.turnMotor.setVoltage(volts);
+        this.turnMotor.setVoltage(-volts);
     }
 
     public SwerveModulePosition getPosition() {
