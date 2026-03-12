@@ -62,7 +62,7 @@ public final class Constants {
         public static AngularVelocity maxSpeed = AngularVelocity.ofBaseUnits(5676, Units.RPM);
         public static double thresholdRatio = 0.4;
         public static AngularVelocity thresholdSpeed = maxSpeed.times(thresholdRatio);
-        public static int shooterCANId = 40; 
+        public static int shooterCANId = 17; 
         public static int stagingCANId = 1; //TODO
         public static double ks = 6.0;
         public static double kv;
