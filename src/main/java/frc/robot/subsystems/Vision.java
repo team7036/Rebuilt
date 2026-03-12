@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
@@ -20,14 +21,9 @@ public class Vision extends SubsystemBase {
     // What tags to detect for, limelight only tracks ids placed here
     private final int[] checkedTags = { 9, 10, 5, 8 };
 
-    /*
-     * heartbeatLeniency - How many checks (peroidic, 20 ms) it can fail before
-     * setting active to false
-     * hadHearbeat - If it had a heartbeat in the previous check
+    /* hadHearbeat - If it had a heartbeat in the previous check
      * prevHeartbeat - What the last heartbeat value was
-     * deadChecks - How many checks were dead (no heartbeat)
-     */
-    private final int heartbeatLeniency = 3;
+     * deadChecks - How many checks were dead (no heartbeat) */
     private boolean hadHeartbeat = false;
     private double prevHeartbeat = -1;
     private int deadChecks = 0;
@@ -106,7 +102,7 @@ public class Vision extends SubsystemBase {
             if (!hadHeartbeat) {
                 deadChecks++;
             }
-            if (deadChecks >= heartbeatLeniency) {
+            if (deadChecks >= Constants.Vision.HEARTBEAT_LENIENCY) {
                 active = false;
                 return;
             }
