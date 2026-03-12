@@ -60,9 +60,9 @@ public final class Constants {
     public final class Shooter {
         // max rpm of a neo
         public static AngularVelocity maxSpeed = AngularVelocity.ofBaseUnits(5676, Units.RPM);
-        public static double thresholdRatio = 0.7;
+        public static double thresholdRatio = 0.4;
         public static AngularVelocity thresholdSpeed = maxSpeed.times(thresholdRatio);
-        public static int shooterCANId = 0; //TODO
+        public static int shooterCANId = 60; 
         public static int stagingCANId = 1; //TODO
         public static double ks = 6.0;
         public static double kv;
@@ -70,7 +70,6 @@ public final class Constants {
         public static double ampRatio = 0.55;
         public static double mcl = maxAmps * ampRatio;
         public static int motorCurrentLimits = (int) mcl;
-
     }
 
     public static class Controllers {
