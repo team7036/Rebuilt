@@ -68,7 +68,7 @@ public class Intake extends SubsystemBase {
         double rads = angle.in(Units.Radians);
         this.intakeAngleMotor.setVoltage(
             this.intakeAngleFF.calculate(this.getIntakeAngle(), 0) +
-            this.intakeAnglePID.calculate(rads, this.getIntakeAngle())
+            this.intakeAnglePID.calculate(this.getIntakeAngle(), rads)
         );
     }
     /**
@@ -79,7 +79,7 @@ public class Intake extends SubsystemBase {
     public Command setPrematchAngle() {
         return this.run(() -> this.setIntakeAngle(
             Units.Degrees.ofBaseUnits(0)
-        ));
+        )).until(this.intakeAnglePID::atSetpoint);
     }
 
     /**
@@ -90,7 +90,7 @@ public class Intake extends SubsystemBase {
     public Command setPassiveAngle() {
         return this.run(() -> this.setIntakeAngle(
             Units.Degrees.of(90)
-        ));
+        )).until(this.intakeAnglePID::atSetpoint);
     }
 
     /**
@@ -101,7 +101,7 @@ public class Intake extends SubsystemBase {
     public Command setIntakingAngle() {
         return this.run(() -> this.setIntakeAngle(
             Units.Degrees.of(85)
-        ));
+        )).until(this.intakeAnglePID::atSetpoint);
     }
 
     /**

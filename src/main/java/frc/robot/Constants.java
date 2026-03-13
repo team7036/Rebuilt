@@ -57,7 +57,7 @@ public final class Constants {
     public static class Vision {
         // HEARTBEAT_LENIENCY - How many checks (peroidic, 20 ms) it can fail before setting Vision.active to false
         public static final int HEARTBEAT_LENIENCY = 3;
-
+    }
 
     /** Constants for the Intake subsystem */
     public final class Intake {
@@ -75,7 +75,6 @@ public final class Constants {
             public static int kG = 0;
             public static int kV = 0;
         }
-
     }
 
     public static class Controllers {
