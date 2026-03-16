@@ -17,7 +17,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 public class Shooter extends SubsystemBase {
     private final SparkMax shooterMotor;
     private final SimpleMotorFeedforward feedForward;
-    private final SparkMax stagingMotor;
+    private boolean shooterStopTriggered;
     
     /*
      Shoot fuel by spinning a flywheel
@@ -27,18 +27,22 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
         // motor that runs the shooter
         shooterMotor = new SparkMax(Constants.Shooter.shooterCANId, MotorType.kBrushless);
+        
+        // boolean that is useful for the storage subsystem
+        shooterStopTriggered = false;
+
+        // configure the shooter
         SparkMaxConfig shooterConfig = new SparkMaxConfig();
         shooterConfig
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(Constants.Shooter.motorCurrentLimits);
         shooterMotor.configure(shooterConfig, ResetMode.kResetSafeParameters, null);
-        stagingMotor = new SparkMax(Constants.Shooter.stagingCANId, MotorType.kBrushless); 
-        SparkMaxConfig stagingConfig = new SparkMaxConfig();
-        stagingConfig
-            .smartCurrentLimit(Constants.Shooter.motorCurrentLimits)
-            .idleMode(IdleMode.kBrake);
-        stagingMotor.configure(stagingConfig, ResetMode.kResetSafeParameters, null);
+
+        // initialize the feedforward system
         feedForward = new SimpleMotorFeedforward(Constants.Shooter.ks, Constants.Shooter.kv);
+
+        // set the default command
+        this.setDefaultCommand(stopShooterCommand());
     }
 
     public AngularVelocity getShooterSpeed(){
@@ -50,6 +54,7 @@ public class Shooter extends SubsystemBase {
     }
 
     private void setShooterSpeed(AngularVelocity speed){
+        shooterStopTriggered = false;
         double voltage = feedForward.calculateWithVelocities(
             getShooterSpeed().in(Units.RPM), 
             speed.in(Units.RPM)
@@ -57,29 +62,19 @@ public class Shooter extends SubsystemBase {
         shooterMotor.setVoltage(voltage);
     }
 
+    public boolean shooterBeenStopped() {
+        return shooterStopTriggered;
+    }
+
     private double getCurrentShooterVoltage() {
         return shooterMotor.getBusVoltage();
     }
 
     public Command stopShooterCommand(){
+        shooterStopTriggered = true;
         return this.runOnce(()->setShooterSpeed(AngularVelocity.ofBaseUnits(0, Units.RPM)));
     }
-
-    public AngularVelocity getStagingSpeed(){
-        return AngularVelocity.ofBaseUnits(stagingMotor.getEncoder().getVelocity(), Units.RPM);
-    }
-
-    private void setStagingSpeed(AngularVelocity speed){
-        double voltage = feedForward.calculateWithVelocities(
-            getStagingSpeed().in(Units.RPM), speed.in(Units.RPM));
-        stagingMotor.setVoltage(voltage);
-    }
-
-    public Command stopStagingCommand(){
-        return this.runOnce(()->setStagingSpeed(AngularVelocity.ofBaseUnits(0, Units.RPM)));
-    }
-
-    public Command fireCommand(AngularVelocity speed, boolean fuelStaged){
+    public Command fireCommand(AngularVelocity speed, boolean fuelPresent){
         return this.run(
             // spin the shooter flywheel 
             () -> setShooterSpeed(speed)).until(
@@ -88,18 +83,7 @@ public class Shooter extends SubsystemBase {
             ()->isShooterReady()).andThen(
             
             // keep voltage a constant
-            () -> shooterMotor.setVoltage(getCurrentShooterVoltage())).alongWith(
-
-            this.runEnd(
-            // set staging motor speed
-            () -> {
-                setStagingSpeed(speed);
-            },
-            // once interrupted, stop both motors
-            () -> {
-                stopStagingCommand();
-                stopShooterCommand();
-            })).onlyIf(()-> fuelStaged);
+            () -> shooterMotor.setVoltage(getCurrentShooterVoltage())).onlyIf(()-> fuelPresent);
     }
 
     @Override

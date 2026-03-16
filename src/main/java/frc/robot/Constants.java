@@ -63,16 +63,14 @@ public final class Constants {
         public static double thresholdRatio = 0.4;
         public static AngularVelocity thresholdSpeed = maxSpeed.times(thresholdRatio);
         public static int shooterCANId = 17; 
-        public static int stagingCANId = 1; //TODO
         public static double ks = 6.0;
         public static double kv;
         public static double maxAmps = 100;
         public static double ampRatio = 0.55;
-        public static double mcl = maxAmps * ampRatio;
-        public static int motorCurrentLimits = (int) mcl;
+        public static int motorCurrentLimits = (int)(maxAmps * ampRatio);
     }
 
     public static class Controllers {
-        public static final int DRIVER_PORT = 0;
+        public static final int DRIVER_PORT = 1;
     }
 }

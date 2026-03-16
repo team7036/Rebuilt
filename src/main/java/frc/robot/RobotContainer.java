@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.drive.Drivetrain;
+// import frc.robot.subsystems.drive.Drivetrain;
 import edu.wpi.first.units.Units;
 
 public class RobotContainer {
@@ -16,7 +16,7 @@ public class RobotContainer {
 
     private final Shooter shooter = new Shooter();
 
-    private final Drivetrain drivetrain = new Drivetrain();
+    // private final Drivetrain drivetrain = new Drivetrain();
     public RobotContainer() {
         configureBindings();
     }
@@ -30,9 +30,7 @@ public class RobotContainer {
         //         )
         // );
 
+        // just to test that this command works when we introduce the XBoxController
         driverController.a().whileTrue(shooter.fireCommand(AngularVelocity.ofBaseUnits(2270, Units.RPM), true)); 
     }   
-
-        //System.out.println(Arrays.toString(this.drivetrain.getEncoderValues()));
-    }
-
+}
