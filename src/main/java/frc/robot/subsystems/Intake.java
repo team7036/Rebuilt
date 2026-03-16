@@ -5,7 +5,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,25 +25,30 @@ import frc.robot.Constants;
  */
 
 public class Intake extends SubsystemBase {
-    private final SparkMax intakeAngleMotor, intakeFlywheelMotor;
+    private final SparkMax intakeMotor, angleMotor;
     private final RelativeEncoder intakeAngleEncoder;
 
-    private final PIDController intakeAnglePID;
+    private final ProfiledPIDController intakeAnglePID;
     private final ArmFeedforward intakeAngleFF;
 
     /**
      * Constructs a new intake
      */
     public Intake() {
-        this.intakeAngleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
-        this.intakeFlywheelMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+        this.setDefaultCommand(setStowedCommand());
+        this.angleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
+        this.intakeMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+        this.intakeAngleEncoder = this.angleMotor.getEncoder();
 
-        this.intakeAngleEncoder = this.intakeAngleMotor.getEncoder();
+        Constraints constraints = new Constraints(
+            Constants.Intake.INTAKE_MAX_VELOCITY,
+            Constants.Intake.INTAKE_MAX_ACCELERATION); 
 
-        this.intakeAnglePID = new PIDController(
+        this.intakeAnglePID = new ProfiledPIDController(
             Constants.Intake.PID.kP,
             Constants.Intake.PID.kI,
-            Constants.Intake.PID.kD
+            Constants.Intake.PID.kD,
+            constraints
         );
         this.intakeAngleFF = new ArmFeedforward(
             Constants.Intake.ArmFeedforward.kS,
@@ -66,9 +72,9 @@ public class Intake extends SubsystemBase {
      */
     private void setIntakeAngle(Angle angle) {
         double rads = angle.in(Units.Radians);
-        this.intakeAngleMotor.setVoltage(
-            this.intakeAngleFF.calculate(this.getIntakeAngle(), 0) +
-            this.intakeAnglePID.calculate(this.getIntakeAngle(), rads)
+        this.angleMotor.setVoltage(
+            -(this.intakeAngleFF.calculate(this.getIntakeAngle(), 0) +
+            this.intakeAnglePID.calculate(this.getIntakeAngle(), rads))
         );
     }
     /**
@@ -76,21 +82,23 @@ public class Intake extends SubsystemBase {
      * @return The command to set the arm to the pre-match angle
      */
     //TODO Find angle for pre-match angle instead of 0 degrees
-    public Command setPrematchAngle() {
-        return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.of(0)
-        )).until(this.intakeAnglePID::atSetpoint);
-    }
+    // public Command setPrematchAngle() {
+    //     return this.run(() -> this.setIntakeAngle(
+    //         Units.Degrees.of(0)
+    //     )).until(this.intakeAnglePID::atSetpoint);
+    // }
 
     /**
      * Sets the arm of the intake to the resting angle
      * @return The command to set the arm to the resting angle
      */
     //TODO Find angle for resting angle instead of 90 degrees
-    public Command setPassiveAngle() {
-        return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.of(90)
-        )).until(this.intakeAnglePID::atSetpoint);
+    public Command setStowedCommand() {
+        return this.runOnce(()->this.intakeMotor.set(0)).andThen(
+            this.run(() -> this.setIntakeAngle(
+                Constants.Intake.STOWED_ANGLE
+            )).until(this.intakeAnglePID::atSetpoint)
+        );
     }
 
     /**
@@ -98,10 +106,12 @@ public class Intake extends SubsystemBase {
      * @return The command to set the arm to the intaking angle
      */
     //TODO Find angle for intaking angle instead of 85 degrees
-    public Command setIntakingAngle() {
-        return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.of(85)
-        )).until(this.intakeAnglePID::atSetpoint);
+    public Command setDeployedCommand() {
+        return this.runOnce(()->this.intakeMotor.set(0)).andThen(
+            this.run(() -> this.setIntakeAngle(
+                Constants.Intake.DEPLOYED_ANGLE
+            )).until(this.intakeAnglePID::atSetpoint)
+        );
     }
 
     /**
@@ -109,10 +119,8 @@ public class Intake extends SubsystemBase {
      * @return The command to startup the flywheel
      */
     //TODO Find volts for intake
-    public Command startupFlywheel() {
-        return this.run(() -> this.intakeFlywheelMotor.setVoltage(
-            Units.Volts.of(1)
-        ));
+    public Command startIntakeCommand() {
+        return this.run(() -> this.intakeMotor.setVoltage(Constants.Intake.INTAKE_MOTOR_VOLTAGE));
     }
     /**
      * Shuts down the flywheel
@@ -120,7 +128,7 @@ public class Intake extends SubsystemBase {
      * @implNote Sets the voltage of the flywheel to 0
      */
     public Command killFlywheel() {
-        return this.run(() -> this.intakeFlywheelMotor.setVoltage(
+        return this.run(() -> this.intakeMotor.setVoltage(
             Units.Volts.of(0)
         ));
     }
