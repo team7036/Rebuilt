@@ -78,7 +78,7 @@ public class Intake extends SubsystemBase {
     //TODO Find angle for pre-match angle instead of 0 degrees
     public Command setPrematchAngle() {
         return this.run(() -> this.setIntakeAngle(
-            Units.Degrees.ofBaseUnits(0)
+            Units.Degrees.of(0)
         )).until(this.intakeAnglePID::atSetpoint);
     }
 
