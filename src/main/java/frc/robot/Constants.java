@@ -86,7 +86,7 @@ public final class Constants {
          * Conversion accounting for gear ratio:
          * ~ 0.3026690054
          * 
-         * 
+         * Try 34.85 first
          */
         public static double INTAKE_MAX_VELOCITY = 0;
         public static double INTAKE_MAX_ACCELERATION = 0;
