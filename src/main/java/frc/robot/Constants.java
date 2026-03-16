@@ -61,8 +61,8 @@ public final class Constants {
 
     /** Constants for the Intake subsystem */
     public final class Intake {
-        public static int INTAKE_ANGLE_MOTOR_ID = 0;
-        public static int INTAKE_FLYWHEEL_MOTOR_ID = 0;
+        public static int INTAKE_ANGLE_MOTOR_ID = 16;
+        public static int INTAKE_FLYWHEEL_MOTOR_ID = 17;
 
         public static class PID {
             public static int kP = 0;
@@ -78,6 +78,6 @@ public final class Constants {
     }
 
     public static class Controllers {
-        public static final int DRIVER_PORT = 0;
+        public static final int DRIVER_PORT = 1;
     }
 }
