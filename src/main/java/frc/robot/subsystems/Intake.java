@@ -49,6 +49,7 @@ public class Intake extends SubsystemBase {
             Constants.Intake.ArmFeedforward.kG,
             Constants.Intake.ArmFeedforward.kV
         );
+        this.setDefaultCommand(killFlywheel());
     }
 
     /**
