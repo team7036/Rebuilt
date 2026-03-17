@@ -49,14 +49,14 @@ public class Storage extends SubsystemBase {
     return hasFuel;
    }
 
-   @Override
-   public void periodic(){
-    if (incomingSensor.get()){
-        numberOfBalls++;
-    } else if (outgoingSensor.get()){
-        numberOfBalls--;
-    }
-   }
+//    @Override
+//    public void periodic(){
+//     if (incomingSensor.get()){
+//         numberOfBalls++;
+//     } else if (outgoingSensor.get()){
+//         numberOfBalls--;
+//     }
+//    }
 
     @Override
     public void initSendable(SendableBuilder builder) {
