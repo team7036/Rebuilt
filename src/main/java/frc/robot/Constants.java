@@ -11,6 +11,7 @@ public final class Constants {
 
     public final class Storage {
         public static int motorCanId = 0;
+        public static double feedSpeed = 0.2;
     }
 
     public final class Drivetrain {

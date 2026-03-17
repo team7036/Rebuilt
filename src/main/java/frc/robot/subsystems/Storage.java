@@ -6,71 +6,61 @@ import frc.robot.Constants;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
-
 public class Storage extends SubsystemBase {
-    //Storage motor for raising balls into the shooter.
+    // Storage motor for raising balls into the shooter.
 
-    private final SparkMax storageMotor;
-    private int numberOfBalls = 0;
-    private boolean motorup = false;
+    private final SparkMax feedMotor;
+    public int numberOfBalls = 0;
+    public boolean hasFuel;
     private final DigitalInput incomingSensor;
     private final DigitalInput outgoingSensor;
 
-
-    public Storage(){
-    //Storage motor for raising balls into the shooter.
-       storageMotor = new SparkMax(Constants.Storage.motorCanId, MotorType.kBrushless);
-       incomingSensor = new DigitalInput(0);
-       outgoingSensor = new DigitalInput(1);
+    public Storage() {
+        // Storage motor for raising balls into the shooter.
+        feedMotor = new SparkMax(Constants.Storage.motorCanId, MotorType.kBrushless);
+        incomingSensor = new DigitalInput(0);
+        outgoingSensor = new DigitalInput(1);
+        hasFuel = false;
+        this.setDefaultCommand(stopFeedCommand());
     }
 
-   private Command motorSpinUp(){
-    return this.run(null);
+    public Command stopFeedCommand() {
+        return this.run(() -> feedMotor.set(0));
+    }
 
+   public Command startFeedCommand(){
+    return this.run(()->feedMotor.set(Constants.Storage.feedSpeed)).onlyIf(()->numberOfBalls>0);
    }
 
-    private Command motorSpinDown(){
-    return this.run(null);
+   public boolean storageHasFuel(boolean shooterBeenStopped){
+    if (incomingSensor.get()) {
+        hasFuel = true;
+    }
+    else {
+        if (shooterBeenStopped) {
+            hasFuel = false;
+        }
+    }
+    return hasFuel;
    }
 
-    public Command storageraise(){
-        if (hasBalls()){
-            motorup = true;
-            return motorSpinUp();  
-        }
-        else{
-            motorup = false;
-            return null;
-        }
+   @Override
+   public void periodic(){
+    if (incomingSensor.get()){
+        numberOfBalls++;
+    } else if (outgoingSensor.get()){
+        numberOfBalls--;
     }
-
-
-    public Command storagelower(){
-        return motorSpinDown();
-    }
-
-    public int getNumberOfBalls(){
-        return numberOfBalls;
-    }
-
-    public boolean hasBalls() {
-        return numberOfBalls > 0;
-    }
-
-    public boolean isUp(){
-        return motorup;
-    }
-    
+   }
 
     @Override
-    public void initSendable(SendableBuilder builder){
-        builder.addIntegerProperty("numBalls", this::getNumberOfBalls, null);
+    public void initSendable(SendableBuilder builder) {
+        builder.addIntegerProperty("numBalls", ()->numberOfBalls, null);
     }
 
 }
-
