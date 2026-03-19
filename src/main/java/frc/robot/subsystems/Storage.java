@@ -18,13 +18,13 @@ public class Storage extends SubsystemBase {
     public int numberOfBalls = 0;
     public boolean hasFuel;
     private final DigitalInput incomingSensor;
-    private final DigitalInput outgoingSensor;
+    // private final DigitalInput outgoingSensor;
 
     public Storage() {
         // Storage motor for raising balls into the shooter.
         feedMotor = new SparkMax(Constants.Storage.motorCanId, MotorType.kBrushless);
         incomingSensor = new DigitalInput(0);
-        outgoingSensor = new DigitalInput(1);
+        // outgoingSensor = new DigitalInput(1);
         hasFuel = false;
         this.setDefaultCommand(stopFeedCommand());
     }
@@ -34,7 +34,7 @@ public class Storage extends SubsystemBase {
     }
 
    public Command startFeedCommand(){
-    return this.run(()->feedMotor.set(Constants.Storage.feedSpeed)).onlyIf(()->numberOfBalls>0);
+    return this.run(()->feedMotor.set(Constants.Storage.feedSpeed)).onlyIf(()->storageHasFuel(hasFuel));
    }
 
    public boolean storageHasFuel(boolean shooterBeenStopped){
