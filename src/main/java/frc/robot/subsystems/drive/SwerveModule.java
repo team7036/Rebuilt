@@ -24,6 +24,8 @@ public class SwerveModule extends SubsystemBase {
     private final TalonFX driveMotor, turnMotor;
     private final DutyCycleEncoder turnEncoder;
 
+    private double encoderFullRange = Constants.Swerve.EncoderFullRange;
+
     public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
         this.setName(moduleName);
         // Control
@@ -47,15 +49,15 @@ public class SwerveModule extends SubsystemBase {
         this.driveMotor = new TalonFX(driveMotorId);
         this.turnMotor = new TalonFX(turnMotorId);
 
-        // Setup the encoder to read values from 
-        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, 1, offset);
+        // Setup the encoder to read values from ID, adjusted with the offset.
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, encoderFullRange, offset*encoderFullRange);
         
 
     }
 
     public Angle getTurnPosition() {
-        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder
-        return Units.Degrees.of(raw);
+        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder, 0 -> 2pi
+        return Units.Radians.of(raw-encoderFullRange/2); // Subtract the full range. so the range is -pi -> pi
     }
 
     public Rotation2d getRot2d() {

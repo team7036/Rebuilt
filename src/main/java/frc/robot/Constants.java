@@ -54,7 +54,7 @@ public final class Constants {
     public final class Swerve {
        //public static double ConversionFactor = -360;
 
-       public static double FullRange = 2*Math.PI;
+       public static double EncoderFullRange = 2*Math.PI;
 
         public static class EncoderOffset {
             public static double FrontLeft = 0.09462320236558006;
