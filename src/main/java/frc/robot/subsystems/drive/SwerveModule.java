@@ -74,6 +74,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
+        // TODO: Turning the Right X does not actually update the setpoint
         desiredState.optimize(getRot2d());
         setDriveSpeed( Units.MetersPerSecond.of(desiredState.speedMetersPerSecond) );
         setTurnPosition( Units.Radians.of(desiredState.angle.getRadians()) );

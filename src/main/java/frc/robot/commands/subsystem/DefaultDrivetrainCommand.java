@@ -45,10 +45,6 @@ public class DefaultDrivetrainCommand extends Command {
         double rot = (half ? maxAngularSpeed / 2 : maxAngularSpeed)
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
 
-        // System.out.println("Diagnostics:");
-        // System.out.printf("INPUTS: %f, %f, %f%n", leftX, leftY, rightX);
-        // System.out.printf("RESULTS: %f, %f, %f%n", xSpeed, ySpeed, rot);
-
         this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
     }
 }

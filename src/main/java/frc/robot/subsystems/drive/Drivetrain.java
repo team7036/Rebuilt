@@ -80,7 +80,6 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
-    // PathPlannerMethods
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }

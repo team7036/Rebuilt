@@ -49,7 +49,6 @@ public final class Constants {
         public static final LinearVelocity MAX_LINEAR_VELOCITY = LinearVelocity.ofBaseUnits(2.0, Units.MetersPerSecond);
         // TODO Measure this through experimentation
         public static AngularVelocity MAX_ANGULAR_VELOCITY = AngularVelocity.ofBaseUnits(2.0, Units.RadiansPerSecond);
-        
         public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI * DRIVE_GEAR_RATIO;
     }
 
@@ -68,10 +67,13 @@ public final class Constants {
         }
 
         public static class Position {
-            public static Translation2d FrontLeft = new Translation2d();
-            public static Translation2d FrontRight = new Translation2d();
-            public static Translation2d BackLeft = new Translation2d();
-            public static Translation2d BackRight = new Translation2d();
+
+
+            
+            public static Translation2d FrontLeft = new Translation2d(-0.2794,0.2794);
+            public static Translation2d FrontRight = new Translation2d(0.2794,0.2794);
+            public static Translation2d BackLeft = new Translation2d(-0.2794,-0.2794);
+            public static Translation2d BackRight = new Translation2d(0.2794,-0.2794);
         }
 
         public static class Feedforward {
