@@ -42,7 +42,7 @@ public final class Constants {
     public final class Drivetrain {
         // Swerve Module Specs
         public static final AngularVelocity FREE_SPEED_RPM = Units.RPM.of(108); // rpm
-        public static final Distance WHEEL_DIAMETER = Units.Meters.of(Units.Inches.of(4.0).in(Units.Meters)); // meters, 4 inches
+        public static final Distance WHEEL_DIAMETER = Distance.ofBaseUnits(4, Units.Inches); // 4 inches
         public static final Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.times(Math.PI) ; // meters
         public static final double DRIVE_GEAR_RATIO = 6.12; 
         // TODO Measure this through experimentation
@@ -50,7 +50,7 @@ public final class Constants {
         // TODO Measure this through experimentation
         public static AngularVelocity MAX_ANGULAR_VELOCITY = AngularVelocity.ofBaseUnits(2.0, Units.RadiansPerSecond);
         
-        public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI;
+        public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI * DRIVE_GEAR_RATIO;
     }
 
     public final class Swerve {
@@ -77,7 +77,7 @@ public final class Constants {
         public static class Feedforward {
             public static class Drive {
                 public static double kS = 0;
-                public static double kV = 1.3;
+                public static double kV = 0;
             }
             public static class Turn {
                 public static double kS = 0;
@@ -86,7 +86,7 @@ public final class Constants {
         }
         public static class PID {
             public static class Drive {
-                public static double kP = 3;
+                public static double kP = 10;
                 public static double kI = 0;
                 public static double kD = 0;
             }

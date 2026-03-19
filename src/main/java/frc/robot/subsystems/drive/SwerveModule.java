@@ -68,13 +68,14 @@ public class SwerveModule extends SubsystemBase {
     public LinearVelocity getDriveSpeed() {
         // TODO
         // Translate the linear velocity read by the Kraken's encoder into a distance
-        double angularVelocity = this.driveMotor.getVelocity().getValueAsDouble();
-        return Units.MetersPerSecond.of(angularVelocity * Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER);
+        double rps = this.driveMotor.getVelocity().getValueAsDouble();
+        double ms = rps / Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER;
+        return LinearVelocity.ofBaseUnits(ms, Units.MetersPerSecond);
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
         desiredState.optimize(getRot2d());
-        //setDriveSpeed( Units.MetersPerSecond.of(desiredState.speedMetersPerSecond) );
+        setDriveSpeed( Units.MetersPerSecond.of(desiredState.speedMetersPerSecond) );
         setTurnPosition( Units.Radians.of(desiredState.angle.getRadians()) );
     }
 
