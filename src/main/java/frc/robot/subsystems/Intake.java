@@ -19,9 +19,10 @@ import frc.robot.Constants;
  * 
  * <ul>
  *  <li> Must be completely vertical on match start
- *  <li> Must lower to [VALUE] on match start
+ *  <li> Must lower on match start
  *  <li> 2 motors total, 1 for angle setting and 1 for spinning the flywheel
- *  <li> Constant values for intake
+ *  <li> Constant values for intake for {@code ProfiledPIDController} and {@code ArmFeedforward}
+ *       located in {@code Constants.Intake}
  * </ul>
  */
 
@@ -37,6 +38,7 @@ public class Intake extends SubsystemBase {
      */
     public Intake() {
         this.setDefaultCommand(setStowedCommand());
+        
         this.angleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
         this.intakeMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
         this.intakeAngleEncoder = this.angleMotor.getEncoder();
@@ -51,7 +53,9 @@ public class Intake extends SubsystemBase {
             Constants.Intake.PID.kD,
             constraints
         );
+
         this.intakeAnglePID.enableContinuousInput(-Math.PI, Math.PI);
+
         this.intakeAngleFF = new ArmFeedforward(
             Constants.Intake.ArmFeedforward.kS,
             Constants.Intake.ArmFeedforward.kG,
