@@ -25,7 +25,7 @@ public class SwerveModule extends SubsystemBase {
     private final DutyCycleEncoder turnEncoder;
 
     public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
-        
+        this.setName(moduleName);
         // Control
         this.turnPid = new PIDController(
                 Constants.Swerve.PID.Turn.kP,
@@ -46,14 +46,16 @@ public class SwerveModule extends SubsystemBase {
         // Hardware
         this.driveMotor = new TalonFX(driveMotorId);
         this.turnMotor = new TalonFX(turnMotorId);
-        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, Constants.Swerve.FullRangeOffset, offset*Constants.Swerve.FullRangeOffset);
+
+        // Setup the encoder to read values from 
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, 1, offset);
         
+
     }
 
     public Angle getTurnPosition() {
         double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder
-        double offset = Constants.Swerve.FullRangeOffset/2; // Adds possibility of negative values. For example, 90 is actuallly -90 and 270 is actually 90.
-        return Units.Degrees.of(raw - offset);
+        return Units.Degrees.of(raw);
     }
 
     public Rotation2d getRot2d() {
@@ -65,7 +67,7 @@ public class SwerveModule extends SubsystemBase {
         // TODO
         // Translate the linear velocity read by the Kraken's encoder into a distance
         double angularVelocity = this.driveMotor.getVelocity().getValueAsDouble();
-        return Units.MetersPerSecond.of(angularVelocity);
+        return Units.MetersPerSecond.of(angularVelocity * Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER);
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {

@@ -34,14 +34,34 @@ public class Drivetrain extends SubsystemBase {
 
     public Drivetrain() {
 
-        frontLeft = new SwerveModule("FrontLeftSwerve", IDs.CAN.FrontLeftDrive, IDs.CAN.FrontLeftTurn, IDs.DIO.FrontLeftEncoder,
-                Swerve.ConversionOffset.FrontLeft);
-        frontRight = new SwerveModule("FrontRightSwerve", IDs.CAN.FrontRightDrive, IDs.CAN.FrontRightTurn, IDs.DIO.FrontRightEncoder,
-                Swerve.ConversionOffset.FrontRight);
-        backLeft = new SwerveModule("BackLeftSwerve", IDs.CAN.BackLeftDrive, IDs.CAN.BackLeftTurn, IDs.DIO.BackLeftEncoder,
-                Swerve.ConversionOffset.BackLeft);
-        backRight = new SwerveModule("BackRightSwerve", IDs.CAN.BackRightDrive, IDs.CAN.BackRightTurn, IDs.DIO.BackRightEncoder,
-                Swerve.ConversionOffset.BackRight);
+        frontLeft = new SwerveModule(
+            "FrontLeftSwerve", 
+            IDs.CAN.FrontLeftDrive, 
+            IDs.CAN.FrontLeftTurn, 
+            IDs.DIO.FrontLeftEncoder,
+            Swerve.EncoderOffset.FrontLeft
+        );
+        frontRight = new SwerveModule(
+            "FrontRightSwerve", 
+            IDs.CAN.FrontRightDrive, 
+            IDs.CAN.FrontRightTurn, 
+            IDs.DIO.FrontRightEncoder,
+            Swerve.EncoderOffset.FrontRight
+        );
+        backLeft = new SwerveModule(
+            "BackLeftSwerve", 
+            IDs.CAN.BackLeftDrive, 
+            IDs.CAN.BackLeftTurn, 
+            IDs.DIO.BackLeftEncoder,
+            Swerve.EncoderOffset.BackLeft
+        );
+        backRight = new SwerveModule(
+            "BackRightSwerve", 
+            IDs.CAN.BackRightDrive, 
+            IDs.CAN.BackRightTurn, 
+            IDs.DIO.BackRightEncoder,
+            Swerve.EncoderOffset.BackRight
+        );
 
         gyro = new ADXRS450_Gyro();
 
@@ -92,7 +112,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Rotation2d getAngle() {
-        return Rotation2d.fromRadians(this.gyro.getAngle());
+        return Rotation2d.fromDegrees(this.gyro.getAngle() % 360);
     }
 
     @Override

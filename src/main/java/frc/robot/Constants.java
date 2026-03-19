@@ -5,12 +5,8 @@
 
 package frc.robot;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -51,29 +47,20 @@ public final class Constants {
         public static final double DRIVE_GEAR_RATIO = 6.12; 
         public static final LinearVelocity MAX_LINEAR_VELOCITY = FREE_SPEED_RPM.asFrequency().times(WHEEL_CIRCUMFERENCE);
          //public static double MaxAngularSpeed = MaxSpeed / (WHEEL_DIAMETER.in(Units.Meters) / 2); // rad/s
-
+        
+        public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI;
     }
 
     public final class Swerve {
        //public static double ConversionFactor = -360;
 
-       public static double FullRangeOffset = 360;
+       public static double FullRange = 2*Math.PI;
 
-        public static class ConversionOffset {
-            // y = m*x + b
-            // Radians = slope * magnitude + offset
-            //0.2927756073193902
-            //public static Angle FrontLeft = Units.Degrees.of(0.2927756073193902);
-            public static double FrontLeft = 0.2927756073193902;
-            //0.4625355115633878
-            //public static Angle FrontRight = Units.Degrees.of(0.4625355115633878);
-            public static double FrontRight = 0.4625355115633878;
-            //0.7746222193655555
-            //public static Angle BackLeft = Units.Degrees.of(0.7746222193655555);
-            public static double BackLeft = 0.7746222193655555;
-            //0.44647296116182406
-            //public static Angle BackRight = Units.Degrees.of(0.44647296116182406);
-            public static double BackRight = 0.44647296116182406;
+        public static class EncoderOffset {
+            public static double FrontLeft = 0.09462320236558006;
+            public static double FrontRight = 0.4573415114335378;
+            public static double BackLeft = 0.09562225239055631;
+            public static double BackRight = 0.7770506444262661;
         }
 
         public static class Position {
@@ -100,7 +87,8 @@ public final class Constants {
                 public static double kD = 0;
             }
             public static class Turn {
-                public static double kP = 3;
+                public static double kP = 3
+                ;
                 public static double kI = 0;
                 public static double kD = 0;
             }
