@@ -58,22 +58,18 @@ public final class Constants {
        public static double EncoderFullRange = 2*Math.PI;
 
         public static class EncoderOffset {
-            // 0.41077401026935023
-            public static double FrontLeft = 0.41077401026935023;
-            // 0.4487665112191628
+            public static double FrontLeft = 0.6380600159515004 ;
             public static double FrontRight = 0.4487665112191628;
             public static double BackLeft = 0.2867699571692489;
             public static double BackRight = 0.10833915270847881;
         }
 
         public static class Position {
-
-
             
-            public static Translation2d FrontLeft = new Translation2d(-0.2794,0.2794);
-            public static Translation2d FrontRight = new Translation2d(0.2794,0.2794);
-            public static Translation2d BackLeft = new Translation2d(-0.2794,-0.2794);
-            public static Translation2d BackRight = new Translation2d(0.2794,-0.2794);
+            public static Translation2d FrontLeft = new Translation2d(0.2794,0.2794);
+            public static Translation2d FrontRight  = new Translation2d(0.2794,-0.2794);
+            public static Translation2d BackLeft = new Translation2d(-0.2794,0.2794);
+            public static Translation2d BackRight = new Translation2d(-0.2794,-0.2794);
         }
 
         public static class Feedforward {
