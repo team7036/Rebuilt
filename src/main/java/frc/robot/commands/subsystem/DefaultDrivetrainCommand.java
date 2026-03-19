@@ -19,7 +19,7 @@ public class DefaultDrivetrainCommand extends Command {
     private final SlewRateLimiter rotSpeedLimiter = new SlewRateLimiter(3);
 
     private final double maxSpeed = Constants.Drivetrain.MAX_LINEAR_VELOCITY.in(Units.MetersPerSecond);
-    private final double maxAngularSpeed = maxSpeed * Constants.Drivetrain.WHEEL_DIAMETER.div(2).in(Units.Meters);
+    private final double maxAngularSpeed = Constants.Drivetrain.MAX_ANGULAR_VELOCITY.in(Units.RadiansPerSecond);
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
 

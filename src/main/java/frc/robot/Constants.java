@@ -45,8 +45,10 @@ public final class Constants {
         public static final Distance WHEEL_DIAMETER = Units.Meters.of(Units.Inches.of(4.0).in(Units.Meters)); // meters, 4 inches
         public static final Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.times(Math.PI) ; // meters
         public static final double DRIVE_GEAR_RATIO = 6.12; 
-        public static final LinearVelocity MAX_LINEAR_VELOCITY = FREE_SPEED_RPM.asFrequency().times(WHEEL_CIRCUMFERENCE);
-         //public static double MaxAngularSpeed = MaxSpeed / (WHEEL_DIAMETER.in(Units.Meters) / 2); // rad/s
+        // TODO Measure this through experimentation
+        public static final LinearVelocity MAX_LINEAR_VELOCITY = LinearVelocity.ofBaseUnits(2.0, Units.MetersPerSecond);
+        // TODO Measure this through experimentation
+        public static AngularVelocity MAX_ANGULAR_VELOCITY = AngularVelocity.ofBaseUnits(2.0, Units.RadiansPerSecond);
         
         public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI;
     }
@@ -57,10 +59,12 @@ public final class Constants {
        public static double EncoderFullRange = 2*Math.PI;
 
         public static class EncoderOffset {
-            public static double FrontLeft = 0.09462320236558006;
-            public static double FrontRight = 0.4573415114335378;
-            public static double BackLeft = 0.09562225239055631;
-            public static double BackRight = 0.7770506444262661;
+            // 0.41077401026935023
+            public static double FrontLeft = 0.41077401026935023;
+            // 0.4487665112191628
+            public static double FrontRight = 0.4487665112191628;
+            public static double BackLeft = 0.2867699571692489;
+            public static double BackRight = 0.10833915270847881;
         }
 
         public static class Position {
@@ -87,8 +91,7 @@ public final class Constants {
                 public static double kD = 0;
             }
             public static class Turn {
-                public static double kP = 3
-                ;
+                public static double kP = 12;
                 public static double kI = 0;
                 public static double kD = 0;
             }

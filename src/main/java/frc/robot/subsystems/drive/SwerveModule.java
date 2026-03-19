@@ -50,14 +50,14 @@ public class SwerveModule extends SubsystemBase {
         this.turnMotor = new TalonFX(turnMotorId);
 
         // Setup the encoder to read values from ID, adjusted with the offset.
-        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, encoderFullRange, offset*encoderFullRange);
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, 1, offset);
         
 
     }
 
     public Angle getTurnPosition() {
-        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder, 0 -> 2pi
-        return Units.Radians.of(raw-encoderFullRange/2); // Subtract the full range. so the range is -pi -> pi
+        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder, 0 -> 1 rotation
+        return Units.Radians.of(encoderFullRange * (raw-0.5)); // Subtract half of the full range. so the range is -pi -> pi
     }
 
     public Rotation2d getRot2d() {
@@ -106,6 +106,5 @@ public class SwerveModule extends SubsystemBase {
         builder.addDoubleProperty("speed/raw", ()->driveMotor.getVelocity().getValueAsDouble(),null);
         builder.addDoubleProperty("speed/metersPerSecond", ()->getDriveSpeed().in(Units.MetersPerSecond), null);
         builder.addDoubleProperty("speed/setpoint", drivePid::getSetpoint, null);
-        SmartDashboard.putData("%s-pid".formatted(this.getName()), turnPid);
     }
 }
