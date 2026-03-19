@@ -6,6 +6,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 
 public final class Constants {
@@ -64,13 +65,14 @@ public final class Constants {
     public final class Intake {
         public static int INTAKE_ANGLE_MOTOR_ID = 40;
         public static int INTAKE_FLYWHEEL_MOTOR_ID = 55;
+        
         public static double INTAKE_MOTOR_VOLTAGE = 5.0;
 
         private static double RAW_STOWED_ANGLE = 0.0;
-        public static Angle STOWED_ANGLE = Angle.ofBaseUnits(RAW_STOWED_ANGLE, null);
+        public static Angle STOWED_ANGLE = Units.Degrees.of(RAW_STOWED_ANGLE).times(34.85);
 
         private static double RAW_DEPLOYED_ANGLE = -1.557;
-        public static Angle DEPLOYED_ANGLE = Angle.ofBaseUnits(RAW_DEPLOYED_ANGLE, null);
+        public static Angle DEPLOYED_ANGLE = Units.Degrees.of(RAW_DEPLOYED_ANGLE).times(34.85);
         /*
          * ~30 (must be under at least, cannot be over) inches off ground
          * Robot is ~2 inches off ground
