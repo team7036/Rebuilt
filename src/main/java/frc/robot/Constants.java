@@ -58,7 +58,7 @@ public final class Constants {
        public static double EncoderFullRange = 2*Math.PI;
 
         public static class EncoderOffset {
-            public static double FrontLeft = 0.6380600159515004 ;
+            public static double FrontLeft = 0.6348880158722005 ;
             public static double FrontRight = 0.4487665112191628;
             public static double BackLeft = 0.2867699571692489;
             public static double BackRight = 0.10833915270847881;

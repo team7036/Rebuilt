@@ -117,6 +117,9 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("DrivetrainSubsystem");
+        builder.addDoubleProperty("drive/speeds/x", ()->getRobotRelativeSpeeds().vxMetersPerSecond, null);
+        builder.addDoubleProperty("drive/speeds/y", ()->getRobotRelativeSpeeds().vyMetersPerSecond, null);
+        builder.addDoubleProperty("drive/speeds/rot", ()->getRobotRelativeSpeeds().omegaRadiansPerSecond, null);
         SmartDashboard.putData("drive/swerve/backLeft", backLeft);
         SmartDashboard.putData("drive/swerve/backRight", backRight);
         SmartDashboard.putData("drive/swerve/frontRight", frontRight);
