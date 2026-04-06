@@ -26,8 +26,7 @@ public class SwerveModule extends SubsystemBase {
 
     private double encoderFullRange = Constants.Swerve.EncoderFullRange;
 
-    public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
-        this.setName(moduleName);
+    public SwerveModule(int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
         // Control
         this.turnPid = new PIDController(
                 Constants.Swerve.PID.Turn.kP,
