@@ -35,33 +35,34 @@ public class Drivetrain extends SubsystemBase {
     public Drivetrain() {
 
         frontLeft = new SwerveModule(
-            "FrontLeftSwerve", 
             IDs.CAN.FrontLeftDrive, 
             IDs.CAN.FrontLeftTurn, 
             IDs.DIO.FrontLeftEncoder,
             Swerve.EncoderOffset.FrontLeft
         );
+        frontLeft.setName("FrontLeftSwerve");
+        
         frontRight = new SwerveModule(
-            "FrontRightSwerve", 
             IDs.CAN.FrontRightDrive, 
             IDs.CAN.FrontRightTurn, 
             IDs.DIO.FrontRightEncoder,
             Swerve.EncoderOffset.FrontRight
         );
+        frontRight.setName("FrontRightSwerve");
         backLeft = new SwerveModule(
-            "BackLeftSwerve", 
             IDs.CAN.BackLeftDrive, 
             IDs.CAN.BackLeftTurn, 
             IDs.DIO.BackLeftEncoder,
             Swerve.EncoderOffset.BackLeft
         );
+        backLeft.setName("BackLeftSwerve");
         backRight = new SwerveModule(
-            "BackRightSwerve", 
             IDs.CAN.BackRightDrive, 
             IDs.CAN.BackRightTurn, 
             IDs.DIO.BackRightEncoder,
             Swerve.EncoderOffset.BackRight
         );
+        backRight.setName("BackRightSwerve");
 
         gyro = new ADXRS450_Gyro();
 
