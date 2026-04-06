@@ -6,49 +6,92 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class Constants {
 
+    public final class IDs {
+
+        public final class Controllers {
+            public static int Driver = 0;
+        }
+
+        public final class DIO {
+            public static int FrontLeftEncoder = 0;
+            public static int FrontRightEncoder = 1;
+            public static int BackLeftEncoder = 3;
+            public static int BackRightEncoder = 4;
+
+        }
+
+        public final class CAN {
+            public static int FrontLeftDrive = 10;
+            public static int FrontLeftTurn = 11;
+            public static int FrontRightDrive = 12;
+            public static int FrontRightTurn = 13;
+            public static int BackLeftDrive = 14;
+            public static int BackLeftTurn = 15;
+            public static int BackRightDrive = 16;
+            public static int BackRightTurn = 17;
+        }
+    }
+
     public final class Drivetrain {
-        public static double maxSpeed = 1.0;
+        // Swerve Module Specs
+        public static final AngularVelocity FREE_SPEED_RPM = Units.RPM.of(108); // rpm
+        public static final Distance WHEEL_DIAMETER = Distance.ofBaseUnits(4, Units.Inches); // 4 inches
+        public static final Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.times(Math.PI) ; // meters
+        public static final double DRIVE_GEAR_RATIO = 6.12; 
+        // TODO Measure this through experimentation
+        public static final LinearVelocity MAX_LINEAR_VELOCITY = LinearVelocity.ofBaseUnits(2.0, Units.MetersPerSecond);
+        // TODO Measure this through experimentation
+        public static AngularVelocity MAX_ANGULAR_VELOCITY = AngularVelocity.ofBaseUnits(2.0, Units.RadiansPerSecond);
+        public static final double MOTOR_ROTATIONS_PER_METER = WHEEL_CIRCUMFERENCE.in(Units.Meters) * Math.PI * DRIVE_GEAR_RATIO;
     }
 
     public final class Swerve {
+       //public static double ConversionFactor = -360;
 
-        public static final Swerve.IDs FrontLeft = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs FrontRight = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs BackLeft = new Swerve.IDs(0, 0, 0, 0);
-        public static final Swerve.IDs BackRight = new Swerve.IDs(0, 0, 0, 0);
+       public static double EncoderFullRange = 2*Math.PI;
 
-        public static class IDs {
-            public final int turnMotorId;
-            public final int turnEncoderId;
-            public final int driveMotorId;
-            public final int driveEncoderId;
-            public IDs(int turnMotorId, int turnEncoderId, int driveMotorId, int driveEncoderId){
-                this.turnMotorId = turnMotorId;
-                this.turnEncoderId = turnEncoderId;
-                this.driveMotorId = driveMotorId;
-                this.driveEncoderId = driveEncoderId;
-            }
+        public static class EncoderOffset {
+            public static double FrontLeft = 0.6348880158722005 ;
+            public static double FrontRight = 0.4487665112191628;
+            public static double BackLeft = 0.2867699571692489;
+            public static double BackRight = 0.10833915270847881;
         }
 
         public static class Position {
-            public static Translation2d FrontLeft = new Translation2d();
-            public static Translation2d FrontRight = new Translation2d();
-            public static Translation2d BackLeft = new Translation2d();
-            public static Translation2d BackRight = new Translation2d();
+            
+            public static Translation2d FrontLeft = new Translation2d(0.2794,0.2794);
+            public static Translation2d FrontRight  = new Translation2d(0.2794,-0.2794);
+            public static Translation2d BackLeft = new Translation2d(-0.2794,0.2794);
+            public static Translation2d BackRight = new Translation2d(-0.2794,-0.2794);
         }
 
-        public static class Control {
-            public static class DriveFeedforward {
-                public static int kS = 0;
-                public static int kV = 0;
+        public static class Feedforward {
+            public static class Drive {
+                public static double kS = 0;
+                public static double kV = 0;
             }
-            public static class TurnPID {
-                public static int kP = 0;
-                public static int kI = 0;
-                public static int kD = 0;
+            public static class Turn {
+                public static double kS = 0;
+                public static double kV = 0;
+            }
+        }
+        public static class PID {
+            public static class Drive {
+                public static double kP = 10;
+                public static double kI = 0;
+                public static double kD = 0;
+            }
+            public static class Turn {
+                public static double kP = 12;
+                public static double kI = 0;
+                public static double kD = 0;
             }
         }
     }

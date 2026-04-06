@@ -3,29 +3,25 @@ package frc.robot.commands.subsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drivetrain;
-import java.util.function.Function;
 
 public class DefaultDrivetrainCommand extends Command {
-    private static final Function<Double, SlewRateLimiter> RATE_LIMITER_FACTORY = SlewRateLimiter::new;
-
     private final Drivetrain drivetrain;
 
     private final CommandXboxController driveController;
 
-    private final SlewRateLimiter xSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
-    private final SlewRateLimiter ySpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
-    private final SlewRateLimiter rotSpeedLimiter = RATE_LIMITER_FACTORY.apply(3.0);
+    private final SlewRateLimiter xSpeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter ySpeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter rotSpeedLimiter = new SlewRateLimiter(3);
 
-    private final double maxSpeed, maxAngularSpeed;
-
+    private final double maxSpeed = Constants.Drivetrain.MAX_LINEAR_VELOCITY.in(Units.MetersPerSecond);
+    private final double maxAngularSpeed = Constants.Drivetrain.MAX_ANGULAR_VELOCITY.in(Units.RadiansPerSecond);
     public DefaultDrivetrainCommand(Drivetrain drivetrain, CommandXboxController driveController) {
         this.drivetrain = drivetrain;
-        this.maxSpeed = Constants.Drivetrain.maxSpeed;
-        this.maxAngularSpeed = this.maxSpeed / 0.34925;
 
         this.driveController = driveController;
 
@@ -50,6 +46,5 @@ public class DefaultDrivetrainCommand extends Command {
                 * -rotSpeedLimiter.calculate(MathUtil.applyDeadband(rightX, 0.04));
 
         this.drivetrain.driveRobotRelative(new ChassisSpeeds(xSpeed, ySpeed, rot));
-
     }
 }

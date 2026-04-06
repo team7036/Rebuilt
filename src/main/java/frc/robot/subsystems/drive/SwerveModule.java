@@ -7,71 +7,105 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Swerve;
-import frc.robot.custom.TalonFXEncoder;
 
-public class SwerveModule {
+public class SwerveModule extends SubsystemBase {
 
-    private final PIDController turnPid;
-    private final SimpleMotorFeedforward driveFeedforward;
+    private final PIDController turnPid, drivePid;
+    private final SimpleMotorFeedforward driveFeedforward, turnFeedforward;
 
     private final TalonFX driveMotor, turnMotor;
-    private final Encoder driveEncoder;
     private final DutyCycleEncoder turnEncoder;
 
-    public SwerveModule(Swerve.IDs ids) {
+    private double encoderFullRange = Constants.Swerve.EncoderFullRange;
+
+    public SwerveModule(String moduleName, int driveMotorId, int turnMotorId, int turnEncoderId, double offset) {
+        this.setName(moduleName);
         // Control
-        turnPid = new PIDController(
-            Constants.Swerve.Control.TurnPID.kP, 
-            Constants.Swerve.Control.TurnPID.kI,
-            Constants.Swerve.Control.TurnPID.kD
+        this.turnPid = new PIDController(
+                Constants.Swerve.PID.Turn.kP,
+                Constants.Swerve.PID.Turn.kI,
+                Constants.Swerve.PID.Turn.kD);
+        this.turnPid.enableContinuousInput(-Math.PI, Math.PI);
+        this.turnFeedforward = new SimpleMotorFeedforward(
+            Constants.Swerve.Feedforward.Turn.kS,
+            Constants.Swerve.Feedforward.Turn.kV
         );
-        driveFeedforward = new SimpleMotorFeedforward(
-            Constants.Swerve.Control.DriveFeedforward.kS, 
-            Constants.Swerve.Control.DriveFeedforward.kV
-        );
+        this.drivePid = new PIDController(
+                Constants.Swerve.PID.Drive.kP,
+                Constants.Swerve.PID.Drive.kI,
+                Constants.Swerve.PID.Drive.kD);
+        this.driveFeedforward = new SimpleMotorFeedforward(
+                Constants.Swerve.Feedforward.Drive.kS,
+                Constants.Swerve.Feedforward.Drive.kV);
         // Hardware
-        driveMotor = new TalonFX(ids.driveMotorId);
-        driveEncoder = new TalonFXEncoder(driveMotor);
-        turnMotor = new TalonFX(ids.turnMotorId);
-        turnEncoder = new DutyCycleEncoder(ids.turnEncoderId);
+        this.driveMotor = new TalonFX(driveMotorId);
+        this.turnMotor = new TalonFX(turnMotorId);
+
+        // Setup the encoder to read values from ID, adjusted with the offset.
+        this.turnEncoder = new DutyCycleEncoder(turnEncoderId, 1, offset);
+        
+
     }
 
-    //Radians
-    public double getTurnPosition() {
-        return turnEncoder.get();
+    public Angle getTurnPosition() {
+        double raw = this.turnEncoder.get(); // Reads the Raw data from the encoder, 0 -> 1 rotation
+        return Units.Radians.of(encoderFullRange * (raw-0.5)); // Subtract half of the full range. so the range is -pi -> pi
     }
+
     public Rotation2d getRot2d() {
-        return Rotation2d.fromRadians(this.getTurnPosition());
+        return Rotation2d.fromRadians(this.getTurnPosition().in(Units.Radians));
     }
+
     // speed m/s
-    public double getDriveSpeed() {
-        return this.driveEncoder.getRate();
+    public LinearVelocity getDriveSpeed() {
+        // TODO
+        // Translate the linear velocity read by the Kraken's encoder into a distance
+        double rps = this.driveMotor.getVelocity().getValueAsDouble();
+        double ms = rps / Constants.Drivetrain.MOTOR_ROTATIONS_PER_METER;
+        return LinearVelocity.ofBaseUnits(ms, Units.MetersPerSecond);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState){
+    public void setDesiredState(SwerveModuleState desiredState) {
         desiredState.optimize(getRot2d());
-        setDriveSpeed(desiredState.speedMetersPerSecond);
-        setTurnPosition(desiredState.angle.getRadians());
+        setDriveSpeed( Units.MetersPerSecond.of(desiredState.speedMetersPerSecond) );
+        setTurnPosition( Units.Radians.of(desiredState.angle.getRadians()) );
     }
 
-    //m/s
-    private void setDriveSpeed(double speed) {
-        double volts = driveFeedforward.calculate(speed);
+    // m/s
+    private void setDriveSpeed(LinearVelocity speed) {
+        double metersPerSecond = speed.in(Units.MetersPerSecond);
+        double volts = driveFeedforward.calculate(metersPerSecond) + drivePid.calculate(getDriveSpeed().in(Units.MetersPerSecond), metersPerSecond);
         this.driveMotor.setVoltage(volts);
     }
 
-    private void setTurnPosition(double rads) {
-        double volts = turnPid.calculate(getTurnPosition(), rads);
-        this.turnMotor.setVoltage(volts);
+    private void setTurnPosition(Angle angle) {
+        double setpoint = angle.in(Units.Radians);
+        double measurement = getTurnPosition().in(Units.Radians);
+        double volts = turnPid.calculate(measurement, setpoint) + turnFeedforward.calculate(measurement);
+        this.turnMotor.setVoltage(-volts);
     }
 
-    public SwerveModulePosition getPosition(){
+    public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            driveEncoder.getDistance(), new Rotation2d(getTurnPosition())
-        );
+                driveMotor.getPosition().getValueAsDouble(), new Rotation2d(getTurnPosition()));
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveModule");
+        builder.addDoubleProperty("angle/raw", turnEncoder::get, null);
+        builder.addDoubleProperty("angle/measured", () -> getTurnPosition().in(Units.Radians), null);
+        builder.addDoubleProperty("angle/setpoint", turnPid::getSetpoint, null);
+        builder.addDoubleProperty("speed/raw", ()->driveMotor.getVelocity().getValueAsDouble(),null);
+        builder.addDoubleProperty("speed/metersPerSecond", ()->getDriveSpeed().in(Units.MetersPerSecond), null);
+        builder.addDoubleProperty("speed/setpoint", drivePid::getSetpoint, null);
     }
 }
