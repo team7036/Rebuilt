@@ -17,6 +17,7 @@ public final class Constants {
 
         public final class Controllers {
             public static int Driver = 0;
+            public static int Operator = 1;
         }
 
         public final class DIO {
@@ -25,9 +26,11 @@ public final class Constants {
             public static int BackLeftEncoder = 3;
             public static int BackRightEncoder = 4;
 
+            public static int ShooterFuelSensor = 9;
         }
 
         public final class CAN {
+            // Swerve
             public static int FrontLeftDrive = 10;
             public static int FrontLeftTurn = 11;
             public static int FrontRightDrive = 12;
@@ -36,7 +39,15 @@ public final class Constants {
             public static int BackLeftTurn = 15;
             public static int BackRightDrive = 16;
             public static int BackRightTurn = 17;
+            // Shooter
+            public static int ShooterLeader = 51;
+            public static int ShooterFollower = 55;
+            public static int ShooterStaging = 40;
         }
+    }
+
+    public final class Shooter {
+        public static double StagingSpeed = -0.2;
     }
 
     public final class Drivetrain {
