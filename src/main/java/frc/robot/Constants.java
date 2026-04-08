@@ -7,6 +7,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -47,7 +49,7 @@ public final class Constants {
     }
 
     public final class Shooter {
-        public static double StagingSpeed = -0.2;
+        public static double STAGING_SPEED = -0.2;
     }
 
     public final class Drivetrain {
@@ -114,19 +116,30 @@ public final class Constants {
 
     /** Constants for the Intake subsystem */
     public final class Intake {
-        public static int INTAKE_ANGLE_MOTOR_ID = 0;
-        public static int INTAKE_FLYWHEEL_MOTOR_ID = 0;
+        public static int INTAKE_ANGLE_MOTOR_ID = 60;
+        public static int INTAKE_FLYWHEEL_MOTOR_ID = 45;
 
-        public static class PID {
-            public static int kP = 0;
-            public static int kI = 0;
-            public static int kD = 0;
+        public static double ANGLE_MAX_VELOCITY = 5.0;
+        public static double ANGLE_MAX_ACCELERATION = 9.0;
+
+        public static double POSITION_CONVERSION_FACTOR = 0.05;
+        public static double VELOCITY_CONVERSION_FACTOR = 0.00084;
+
+        public static double STOWED_ANGLE = 0.1;
+        public static double OFFSET_ANGLE = 2.425; // The measure angle where the arm is parallel with the floor
+        public static double INTAKING_ANGLE = 2.7;
+        public static double FLYWHEEL_SPEED = -1;
+
+        public static class AnglePID {
+            public static double kP = 3.0;
+            public static double kI = 0;
+            public static double kD = 0;
         }
 
-        public static class ArmFeedforward {
-            public static int kS = 0;
-            public static int kG = 0;
-            public static int kV = 0;
+        public static class AngleFeedForward {
+            public static double kS = 0.0; // volts, static gain that keeps the arm from moving
+            public static double kG = 0.3596; // volts, how much voltage it needs to overcome gravity
+            public static double kV = 0.4; // volts * seconds / radians, how quickly the arm moves for every volt
         }
     }
 

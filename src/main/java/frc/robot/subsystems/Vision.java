@@ -41,7 +41,7 @@ public class Vision extends SubsystemBase {
                 0.0, // Side offset (meters)
                 0.5, // Height offset (meters)
                 0.0, // Roll (degrees)
-                30.0, // Pitch (degrees)
+                0.0, // Pitch (degrees)
                 0.0 // Yaw (degrees)
         );
         LimelightHelpers.setFiducial3DOffset("",
