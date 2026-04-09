@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.commands.intake.SetIntakeAngleCommand;
 
 /**
  * The Intake for the robot:
@@ -30,17 +29,33 @@ import frc.robot.commands.intake.SetIntakeAngleCommand;
 
 public class Intake extends SubsystemBase {
 
-    private final SparkMax angleMotor, flywheelMotor;
-    private final SparkMaxConfig angleConfig, flywheelConfig;
+    private final SparkMax angleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMaxConfig angleConfig = new SparkMaxConfig();
+
+    private final SparkMax flywheelMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMaxConfig flywheelConfig = new SparkMaxConfig();
+
+    private double angle = Constants.Intake.STOWED_ANGLE;
+
+    private final ProfiledPIDController anglePID = new ProfiledPIDController(
+            Constants.Intake.AnglePID.kP,
+            Constants.Intake.AnglePID.kI,
+            Constants.Intake.AnglePID.kD,
+            new TrapezoidProfile.Constraints(
+                Constants.Intake.ANGLE_MAX_VELOCITY, 
+                Constants.Intake.ANGLE_MAX_ACCELERATION
+            )
+        );
+    private final ArmFeedforward angleFF = new ArmFeedforward(
+            Constants.Intake.AngleFeedForward.kS,
+            Constants.Intake.AngleFeedForward.kG,
+            Constants.Intake.AngleFeedForward.kV
+        );
 
     /**
      * Constructs a new intake
      */
-    public Intake() {
-        this.angleMotor = new SparkMax(Constants.Intake.INTAKE_ANGLE_MOTOR_ID, MotorType.kBrushless);
-        this.angleConfig = new SparkMaxConfig();
-        this.flywheelMotor = new SparkMax(Constants.Intake.INTAKE_FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
-        this.flywheelConfig = new SparkMaxConfig();
+    public Intake(){
         configureMotors();
         this.setDefaultCommand(stowIntakeCommand());
     }
@@ -69,6 +84,13 @@ public class Intake extends SubsystemBase {
         return angleMotor.getEncoder().getPosition();
     }
 
+    public void setAngle(double angle){
+        angleMotor.setVoltage(
+            anglePID.calculate(getAngle(), angle) +
+            angleFF.calculate(getAngle(), 0)
+        );
+    }
+
     public void setAngleVoltage(double volts){
         angleMotor.setVoltage(volts);
     }
@@ -78,20 +100,22 @@ public class Intake extends SubsystemBase {
     }
 
     public Command lowerIntakeCommand(){
-        return new SetIntakeAngleCommand(this, Constants.Intake.INTAKING_ANGLE);
+        return this.run(()->setAngle(Constants.Intake.INTAKING_ANGLE));
     }
 
     public Command raiseIntakeCommand(){
-        return new SetIntakeAngleCommand(this, Constants.Intake.STOWED_ANGLE);
+        return this.run(()->setAngle(Constants.Intake.STOWED_ANGLE));
     }
 
     public Command intakeFuelCommand(){
-        return lowerIntakeCommand().andThen(()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED));
+        return this.runOnce((()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED))).andThen(lowerIntakeCommand());
     }
 
+    @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("ShooterSubsystem");
         builder.addDoubleProperty("angle/measured", this::getAngle, null);
+        SmartDashboard.putData("Intake/angle/pid", anglePID);
         SmartDashboard.putData("Intake/raise", raiseIntakeCommand());
         SmartDashboard.putData("Intake/lower", lowerIntakeCommand());
     }

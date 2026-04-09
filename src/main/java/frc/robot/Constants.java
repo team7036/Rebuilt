@@ -134,7 +134,7 @@ public final class Constants {
         
 
         public static class AnglePID {
-            public static double kP = 3.0;
+            public static double kP = 15.0;
             public static double kI = 0;
             public static double kD = 0;
         }
