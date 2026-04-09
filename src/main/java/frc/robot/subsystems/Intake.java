@@ -73,10 +73,6 @@ public class Intake extends SubsystemBase {
         angleMotor.setVoltage(volts);
     }
 
-    private boolean canIntake(){
-        return getAngle() >= Constants.Intake.LOWERED_THRESHOLD;
-    }
-
     public boolean canShoot(){
         return getAngle() >= Constants.Intake.SHOOT_THRESHOLD;
     }
@@ -86,11 +82,11 @@ public class Intake extends SubsystemBase {
     }
 
     public Command raiseIntakeCommand(){
-        return this.run(()->{});
+        return new SetIntakeAngleCommand(this, Constants.Intake.STOWED_ANGLE);
     }
 
     public Command intakeFuelCommand(){
-        return this.run(()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED)).onlyIf(this::canIntake);
+        return lowerIntakeCommand().andThen(()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED));
     }
 
     public void initSendable(SendableBuilder builder) {
