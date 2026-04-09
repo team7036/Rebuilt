@@ -86,7 +86,7 @@ public class Intake extends SubsystemBase {
         return this.runOnce(()->flywheelMotor.set(0)).andThen(raiseIntakeCommand());
     }
 
-    private double getAngle(){
+    public double getAngle(){
         return angleMotor.getEncoder().getPosition();
     }
 
