@@ -125,7 +125,7 @@ public final class Constants {
         public static double POSITION_CONVERSION_FACTOR = 0.05;
         public static double VELOCITY_CONVERSION_FACTOR = 0.00084;
 
-        public static double STOWED_ANGLE = 0.1;
+        public static double STOWED_ANGLE = 0;
         public static double OFFSET_ANGLE = 2.425; // The measure angle where the arm is parallel with the floor
         public static double LOWERED_THRESHOLD = 2.6; // The angle where the intake flywheel can start
         public static double SHOOT_THRESHOLD = 1.0; // The angle where the intake flywheel can start

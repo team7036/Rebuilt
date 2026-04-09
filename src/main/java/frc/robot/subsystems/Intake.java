@@ -76,10 +76,6 @@ public class Intake extends SubsystemBase {
         flywheelMotor.configure(flywheelConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
-    public Command stowIntakeCommand(){
-        return this.runOnce(()->flywheelMotor.set(0)).andThen(raiseIntakeCommand());
-    }
-
     public double getAngle(){
         return angleMotor.getEncoder().getPosition();
     }
@@ -99,16 +95,34 @@ public class Intake extends SubsystemBase {
         return getAngle() >= Constants.Intake.SHOOT_THRESHOLD;
     }
 
-    public Command lowerIntakeCommand(){
-        return this.run(()->setAngle(Constants.Intake.INTAKING_ANGLE));
+    private void stopFlywheel(){
+        flywheelMotor.set(0);
     }
 
-    public Command raiseIntakeCommand(){
-        return this.run(()->setAngle(Constants.Intake.STOWED_ANGLE));
+    private void startFlywheel(){
+        flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED);
     }
 
-    public Command intakeFuelCommand(){
-        return this.runOnce((()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED))).andThen(lowerIntakeCommand());
+    public void lowerIntake(){
+        setAngle(Constants.Intake.INTAKING_ANGLE);
+    }
+
+    public void raiseIntake(){
+        setAngle(Constants.Intake.STOWED_ANGLE);
+    }
+
+    public Command runIntakeCommand(){
+        return this.run(()->{
+            lowerIntake();
+            startFlywheel();
+        });
+    }
+
+    public Command stowIntakeCommand(){
+        return this.run(()->{
+            raiseIntake();
+            stopFlywheel();
+        });
     }
 
     @Override
@@ -116,8 +130,8 @@ public class Intake extends SubsystemBase {
         builder.setSmartDashboardType("ShooterSubsystem");
         builder.addDoubleProperty("angle/measured", this::getAngle, null);
         SmartDashboard.putData("Intake/angle/pid", anglePID);
-        SmartDashboard.putData("Intake/raise", raiseIntakeCommand());
-        SmartDashboard.putData("Intake/lower", lowerIntakeCommand());
+        SmartDashboard.putData("Intake/run", runIntakeCommand());
+        SmartDashboard.putData("Intake/stow", stowIntakeCommand());
     }
 
 }
