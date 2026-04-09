@@ -127,8 +127,11 @@ public final class Constants {
 
         public static double STOWED_ANGLE = 0.1;
         public static double OFFSET_ANGLE = 2.425; // The measure angle where the arm is parallel with the floor
+        public static double LOWERED_THRESHOLD = 2.6; // The angle where the intake flywheel can start
+        public static double SHOOT_THRESHOLD = 1.0; // The angle where the intake flywheel can start
         public static double INTAKING_ANGLE = 2.7;
         public static double FLYWHEEL_SPEED = -1;
+        
 
         public static class AnglePID {
             public static double kP = 3.0;

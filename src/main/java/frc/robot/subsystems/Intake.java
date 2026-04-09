@@ -39,6 +39,8 @@ public class Intake extends SubsystemBase {
     private final ProfiledPIDController anglePID;
     private final ArmFeedforward angleFeedForward;
 
+    private double targetAngle = 0.0;
+
     /**
      * Constructs a new intake
      */
@@ -91,22 +93,34 @@ public class Intake extends SubsystemBase {
     }
 
     private void setAngle(double angle){
-        
-        double pid = anglePID.calculate(getAngle(), angle);
-        double ff = angleFeedForward.calculate(angle - Constants.Intake.OFFSET_ANGLE, 0);
-        angleMotor.setVoltage(pid + ff);
+        targetAngle = angle;
     }
 
-    private Command lowerIntakeCommand(){
-        return this.run(()->setAngle(Constants.Intake.INTAKING_ANGLE)).until(anglePID::atSetpoint);
+    private boolean isLowered(){
+        return getAngle() >= Constants.Intake.LOWERED_THRESHOLD;
     }
 
-    private Command raiseIntakeCommand(){
+    public boolean canShoot(){
+        return getAngle() >= Constants.Intake.SHOOT_THRESHOLD;
+    }
+
+    public Command lowerIntakeCommand(){
+        return this.run(()->setAngle(Constants.Intake.INTAKING_ANGLE));
+    }
+
+    public Command raiseIntakeCommand(){
         return this.run(()->setAngle(Constants.Intake.STOWED_ANGLE));
     }
 
     public Command intakeFuelCommand(){
-        return lowerIntakeCommand().andThen(()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED)).repeatedly();
+        return this.run(()->flywheelMotor.set(Constants.Intake.FLYWHEEL_SPEED)).onlyWhile(this::isLowered);
+    }
+
+    @Override
+    public void periodic(){
+        double pid = anglePID.calculate(getAngle(), targetAngle);
+        double ff = angleFeedForward.calculate(targetAngle - Constants.Intake.OFFSET_ANGLE, 0);
+        angleMotor.setVoltage(pid + ff);
     }
 
     public void initSendable(SendableBuilder builder) {

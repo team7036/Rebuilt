@@ -32,10 +32,18 @@ public class RobotContainer {
 
         operatorController
             .rightBumper()
-            .whileTrue(shooter.fireFuelCommand().onlyIf(()->intake.getAngle()>1));
+            .whileTrue(shooter.fireFuelCommand().onlyWhile(intake::canShoot));
         
         operatorController
             .a()
+            .onTrue(intake.lowerIntakeCommand());
+        
+        operatorController
+            .y()
+            .onTrue(intake.raiseIntakeCommand());
+        
+        operatorController
+            .leftBumper()
             .whileTrue(intake.intakeFuelCommand());
 
     }
