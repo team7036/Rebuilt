@@ -60,6 +60,10 @@ public class Vision extends SubsystemBase {
         active = true;
     }
 
+    public double calculateDistanceToHub(){
+        return 0.0;
+    }
+
     @Override
     public void periodic() {
         // If the limelight disconnected, ignore periodic

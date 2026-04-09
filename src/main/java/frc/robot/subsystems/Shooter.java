@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
         return shootingMotor.getEncoder().getVelocity();
     }
 
-    private boolean isReadyToFire(){
+    private boolean isReadyToFire(double distanceToHub){
         // The Maximum achievable RPM of the NEO depends on the supply
         // voltage recieved from the power supply.
 
@@ -83,9 +83,11 @@ public class Shooter extends SubsystemBase {
         return this.run(()->stagingMotor.set(Constants.Shooter.STAGING_SPEED));
     }
 
-    public Command fireFuelCommand(){
+    public Command fireFuelCommand( double distanceToHub ){
         // Command for launching all of the loaded fuel
-        return this.run(()->shootingMotor.set(1)).until(this::isReadyToFire).andThen(runStagingCommand());
+        return this.run( ()->shootingMotor.set(1) )
+            .until(()->isReadyToFire(distanceToHub))
+            .andThen(runStagingCommand());
     }
 
     public void initSendable(SendableBuilder builder) {
@@ -93,7 +95,5 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("flywheelSpeed", this::getFlyWheelSpeed, null);
         builder.addDoubleProperty("busVoltage", this.shootingMotor::getBusVoltage, null);
         builder.addBooleanProperty("hasFuel", this::hasFuel, null);
-        SmartDashboard.putData("Shooter/fireFuelCommand", fireFuelCommand());
-        SmartDashboard.putData("Shooter/runStagingCommand", runStagingCommand());
     }
 }

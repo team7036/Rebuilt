@@ -30,9 +30,13 @@ public class RobotContainer {
             )
         );
 
+        // TODO Use vision to measure the distance to the hub and make the shooter flywheel speed dynamic
         operatorController
             .rightBumper()
-            .whileTrue(shooter.fireFuelCommand().onlyWhile(intake::canShoot));
+            .whileTrue(
+                shooter.fireFuelCommand( vision.calculateDistanceToHub() )
+                    .onlyWhile(intake::canShoot)
+            );
         
         operatorController
             .a()
