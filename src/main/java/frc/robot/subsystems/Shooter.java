@@ -25,7 +25,6 @@ public class Shooter extends SubsystemBase {
     private final SparkMaxConfig stagingConfig;
     private final DigitalInput fuelSensor = new DigitalInput(Constants.IDs.DIO.ShooterFuelSensor);
     private double targetSpeed;
-    private final PIDController pid = new PIDController(0, 0, 0);
 
     public Shooter(){
         shootingMotor = new SparkMax(Constants.IDs.CAN.ShooterLeader, MotorType.kBrushless);
@@ -76,8 +75,12 @@ public class Shooter extends SubsystemBase {
         });
     }
 
+    public boolean hasFuel(){
+        return fuelSensor.get();
+    }
+
     public Command runStagingCommand(){
-        return this.run(()->stagingMotor.set(-0.2));
+        return this.run(()->stagingMotor.set(Constants.Shooter.STAGING_SPEED));
     }
 
     public Command fireFuelCommand(){
@@ -89,6 +92,7 @@ public class Shooter extends SubsystemBase {
         builder.setSmartDashboardType("ShooterSubsystem");
         builder.addDoubleProperty("flywheelSpeed", this::getFlyWheelSpeed, null);
         builder.addDoubleProperty("busVoltage", this.shootingMotor::getBusVoltage, null);
+        builder.addBooleanProperty("hasFuel", this::hasFuel, null);
         SmartDashboard.putData("Shooter/fireFuelCommand", fireFuelCommand());
         SmartDashboard.putData("Shooter/runStagingCommand", runStagingCommand());
     }
