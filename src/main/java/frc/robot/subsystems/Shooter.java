@@ -68,24 +68,40 @@ public class Shooter extends SubsystemBase {
         return getFlyWheelSpeed() > 4500;
     }
 
-    private Command idleCommand(){
-        return this.runOnce(()->{
-            stagingMotor.set(0);
-            shootingMotor.set(0);
-        });
-    }
-
     public boolean hasFuel(){
-        return fuelSensor.get();
+        return !fuelSensor.get();
     }
 
-    public Command runStagingCommand(){
-        return this.run(()->stagingMotor.set(Constants.Shooter.STAGING_SPEED));
+    private void spinupFlywheel(){
+        shootingMotor.set(1);
+    }
+
+    private void stopFlywheel(){
+        shootingMotor.set(0);
+    }
+
+    private void stopStaging(){
+        stagingMotor.set(0);
+    }
+
+    private void startStaging(){
+        stagingMotor.set(Constants.Shooter.STAGING_SPEED);
+    }
+
+    private Command idleCommand(){
+        return this.run(()->{
+            stopFlywheel();
+            stopStaging();
+        });
     }
 
     public Command fireFuelCommand(){
         // Command for launching all of the loaded fuel
-        return this.run(()->shootingMotor.set(1)).until(this::isReadyToFire).andThen(runStagingCommand());
+        return this.run(this::spinupFlywheel).until(this::isReadyToFire).andThen(this::startStaging);
+    }
+
+    public Command intakeFuelCommand(){
+        return this.run(this::startStaging).onlyWhile(()->!this.hasFuel());
     }
 
     public void initSendable(SendableBuilder builder) {
@@ -93,7 +109,5 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("flywheelSpeed", this::getFlyWheelSpeed, null);
         builder.addDoubleProperty("busVoltage", this.shootingMotor::getBusVoltage, null);
         builder.addBooleanProperty("hasFuel", this::hasFuel, null);
-        SmartDashboard.putData("Shooter/fireFuelCommand", fireFuelCommand());
-        SmartDashboard.putData("Shooter/runStagingCommand", runStagingCommand());
     }
 }
